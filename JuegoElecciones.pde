@@ -1,3 +1,14 @@
+import net.java.games.input.*;
+import org.gamecontrolplus.*;
+import org.gamecontrolplus.gui.*;
+ControlIO control;
+ControlDevice mando;
+
+ControlSlider joystickX;
+ControlSlider joystickY;
+
+boolean mandoConectado = false;
+
 // =====================================================
 // NOVA / CONECTA - versión con mundos amplios y cámara
 // =====================================================
@@ -64,7 +75,50 @@ boolean moverDerecha = false;
 
 void setup() {
   size(1000, 400);
+
   cargarEscenario(1);
+
+  // ============================
+  // CONECTAR MANDO
+  // ============================
+
+  control = ControlIO.getInstance(this);
+
+  mando = null;
+
+  for (int i = 0; i < control.getNumberOfDevices(); i++) {
+
+    ControlDevice dispositivo = control.getDevice(i);
+
+    println(i + ": " + dispositivo.getName());
+
+    String nombre = dispositivo.getName().toLowerCase();
+
+    if (
+      nombre.contains("wireless controller") ||
+      nombre.contains("dualshock") ||
+      nombre.contains("ps4")
+    ) {
+
+      mando = dispositivo;
+      break;
+    }
+  }
+
+  if (mando != null) {
+
+    println("MANDO ENCONTRADO: " + mando.getName());
+
+    joystickX = mando.getSlider(0);
+    joystickY = mando.getSlider(1);
+
+    mandoConectado = true;
+
+  } else {
+
+    println("NO SE ENCONTRO EL MANDO");
+    mandoConectado = false;
+  }
 }
 
 
@@ -111,6 +165,15 @@ void draw() {
 
   // 4. INTERFAZ DE RED SOCIAL
   gestionarRedSocialGUI();
+   if (mandoConectado) {
+  println(
+    "S0: " + mando.getSlider(0).getValue()
+    + " | S1: " + mando.getSlider(1).getValue()
+    + " | S2: " + mando.getSlider(2).getValue()
+    + " | S3: " + mando.getSlider(3).getValue()
+  );
+}
+ 
 }
 
 
@@ -1091,26 +1154,103 @@ void mousePressed() {
 // =====================================================
 
 void moverJugador() {
-  float dx = 0, dy = 0;
+
+  float dx = 0;
+  float dy = 0;
+
+
+  // ==========================================
+  // MOVIMIENTO CON TECLADO WASD
+  // ==========================================
+
   if (moverArriba) dy -= 1;
   if (moverAbajo) dy += 1;
   if (moverIzquierda) dx -= 1;
   if (moverDerecha) dx += 1;
 
-  // Misma velocidad en diagonal
-  if (dx != 0 && dy != 0) {
-    dx *= 0.7071;
-    dy *= 0.7071;
+
+  // ==========================================
+  // MOVIMIENTO CON CONTROL PS4
+  // ==========================================
+
+  if (mandoConectado) {
+
+    float movimientoX = joystickX.getValue();
+    float movimientoY = joystickY.getValue();
+
+
+    // ZONA MUERTA
+    // Evita que el personaje camine solo
+    // cuando el joystick está quieto.
+
+    if (abs(movimientoX) < 0.15) {
+      movimientoX = 0;
+    }
+
+    if (abs(movimientoY) < 0.15) {
+      movimientoY = 0;
+    }
+
+
+    // En tu control los ejes vienen intercambiados.
+    // Esta es la combinación que usamos anteriormente.
+
+    dx += movimientoY;
+    dy += movimientoX;
   }
+
+
+  // ==========================================
+  // VELOCIDAD EN DIAGONAL
+  // ==========================================
+
+  if (dx != 0 && dy != 0) {
+
+    float magnitud = sqrt(dx * dx + dy * dy);
+
+    if (magnitud > 1) {
+      dx /= magnitud;
+      dy /= magnitud;
+    }
+  }
+
+
+  // ==========================================
+  // APLICAR VELOCIDAD
+  // ==========================================
+
   dx *= velocidadJugador;
   dy *= velocidadJugador;
 
-  // Se mueve por ejes separados para poder "deslizarse" por las paredes
-  float nx = constrain(jugadorX + dx, 18, mundoW - 18);
-  if (!colisiona(nx, jugadorY)) jugadorX = nx;
 
-  float ny = constrain(jugadorY + dy, 40, mundoH - 35);
-  if (!colisiona(jugadorX, ny)) jugadorY = ny;
+  // ==========================================
+  // COLISION HORIZONTAL
+  // ==========================================
+
+  float nx = constrain(
+    jugadorX + dx,
+    18,
+    mundoW - 18
+  );
+
+  if (!colisiona(nx, jugadorY)) {
+    jugadorX = nx;
+  }
+
+
+  // ==========================================
+  // COLISION VERTICAL
+  // ==========================================
+
+  float ny = constrain(
+    jugadorY + dy,
+    40,
+    mundoH - 35
+  );
+
+  if (!colisiona(jugadorX, ny)) {
+    jugadorY = ny;
+  }
 }
 
 // Hitbox en los pies del personaje

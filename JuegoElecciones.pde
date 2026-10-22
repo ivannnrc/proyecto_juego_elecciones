@@ -7,10 +7,15 @@ ControlDevice mando;
 ControlSlider joystickX;
 ControlSlider joystickY;
 ControlButton botonCuadrado;
-ControlHat cruceta;
+
+ControlButton botonL1;
+ControlButton botonR1;
+ControlButton botonL2;
 
 boolean cuadradoPresionadoAntes = false;
-
+boolean l1PresionadoAntes = false;
+boolean r1PresionadoAntes = false;
+boolean l2PresionadoAntes = false;
 boolean izquierdaAntes = false;
 boolean arribaAntes = false;
 boolean derechaAntes = false;
@@ -106,7 +111,8 @@ void setup() {
     if (
       nombre.contains("wireless controller") ||
       nombre.contains("dualshock") ||
-      nombre.contains("ps4")
+      nombre.contains("ps4") 
+      
     ) {
 
       mando = dispositivo;
@@ -123,9 +129,10 @@ joystickY = mando.getSlider(1);
 
 // BOTÓN CUADRADO
 botonCuadrado = mando.getButton(4);
+botonL1 = mando.getButton(5);
+botonR1 = mando.getButton(6);
+botonL2 = mando.getButton(7);
 
-// CRUCETA
-cruceta = mando.getHat(0);
 
 mandoConectado = true;
   } else {
@@ -154,13 +161,60 @@ if (mandoConectado) {
 
   cuadradoPresionadoAntes = cuadradoAhora;
 }
+  if (mandoConectado && redSocialAbierta) {
 
-  // 1. MOVER JUGADOR Y ACTUALIZAR CÁMARA
+    boolean l1Ahora = botonL1.pressed();
+    boolean r1Ahora = botonR1.pressed();
+    boolean l2Ahora = botonL2.pressed();
+
+    int idx = obtenerIndicePublicacion(escenario);
+
+
+    if (idx != -1 && !pubProcesadas[idx]) {
+
+
+      // L1 = COMPARTIR
+      if (l1Ahora && !l1PresionadoAntes) {
+
+        procesarDecision(idx, 1);
+      }
+
+
+      // R1 = VERIFICAR / REPORTAR
+      if (r1Ahora && !r1PresionadoAntes) {
+
+        procesarDecision(idx, 2);
+      }
+
+
+      // L2 = IGNORAR
+      if (l2Ahora && !l2PresionadoAntes) {
+
+        procesarDecision(idx, 3);
+      }
+    }
+
+
+    l1PresionadoAntes = l1Ahora;
+    r1PresionadoAntes = r1Ahora;
+    l2PresionadoAntes = l2Ahora;
+  }
+
+
+
+  // ==========================================
+  // MOVIMIENTO DEL JUGADOR
+  // ==========================================
+
   if (!redSocialAbierta) {
+
     moverJugador();
   }
-  actualizarCamara();
 
+  actualizarCamara();
+  revisarCambioEscenario();
+
+ 
   // 2. DIBUJAR EL MUNDO DESPLAZADO POR LA CÁMARA
   noStroke();
   strokeWeight(1);
@@ -216,6 +270,68 @@ if (mandoConectado) {
 void actualizarCamara() {
   camX = constrain(jugadorX - width / 2.0, 0, mundoW - width);
   camY = constrain(jugadorY - height / 2.0, 0, mundoH - height);
+}
+void revisarCambioEscenario() {
+
+  // ==========================================
+  // BARRIO → COLEGIO
+  // ==========================================
+
+  if (escenario == 1) {
+
+    if (jugadorX > mundoW - 40) {
+
+      cargarEscenario(2);
+
+      // aparecer cerca del lado izquierdo
+      jugadorX = 80;
+      jugadorY = 500;
+    }
+  }
+
+
+  // ==========================================
+  // COLEGIO
+  // ==========================================
+
+  else if (escenario == 2) {
+
+    // COLEGIO → BARRIO
+    if (jugadorX < 40) {
+
+      cargarEscenario(1);
+
+      // aparecer cerca del lado derecho
+      jugadorX = mundoW - 80;
+      jugadorY = 455;
+    }
+
+
+    // COLEGIO → PLAZA
+    else if (jugadorX > mundoW - 40) {
+
+      cargarEscenario(3);
+
+      jugadorX = 80;
+      jugadorY = 520;
+    }
+  }
+
+
+  // ==========================================
+  // PLAZA → COLEGIO
+  // ==========================================
+
+  else if (escenario == 3) {
+
+    if (jugadorX < 50) {
+
+      cargarEscenario(2);
+
+      jugadorX = mundoW - 80;
+      jugadorY = 500;
+    }
+  }
 }
 
 
@@ -1045,9 +1161,9 @@ void dibujarPantallaConecta() {
     text(pubTitulos[idx], width/2 - 165, 135, 330, 80);
 
     // Botones de decisión (1, 2, 3)
-    dibujarBotonOpcion(width/2 - 170, 235, "1. Compartir (Aumenta Viralidad)", color(220, 80, 80));
-    dibujarBotonOpcion(width/2 - 170, 280, "2. Verificar / Reportar", color(80, 180, 100));
-    dibujarBotonOpcion(width/2 - 170, 325, "3. Ignorar Publicación", color(120, 130, 140));
+    dibujarBotonOpcion(width/2 - 170, 235, "L1. Compartir (Aumenta Viralidad)", color(220, 80, 80));
+    dibujarBotonOpcion(width/2 - 170, 280, "R1. Verificar / Reportar", color(80, 180, 100));
+    dibujarBotonOpcion(width/2 - 170, 325, "L2. Ignorar Publicación", color(120, 130, 140));
   } else {
     fill(200);
     textAlign(CENTER, CENTER);
@@ -1130,12 +1246,7 @@ void keyPressed() {
     }
   }
 
-  // Cambiar escenario sólo si la red social está cerrada
-  if (!redSocialAbierta) {
-    if (key == '1') cargarEscenario(1);
-    if (key == '2') cargarEscenario(2);
-    if (key == '3') cargarEscenario(3);
-  }
+ 
 
   // Movimiento WASD
   if (key == 'w' || key == 'W') moverArriba = true;

@@ -64,12 +64,13 @@ boolean redSocialAbierta = false;
 float jugadorX = 500;
 float jugadorY = 300;
 float velocidadJugador = 3;
+float animacionCaminar = 0;
 
 boolean moverArriba = false;
 boolean moverAbajo = false;
 boolean moverIzquierda = false;
 boolean moverDerecha = false;
-
+boolean jugadorCaminando = false;
 
 // SETUP
 
@@ -1155,6 +1156,7 @@ void moverJugador() {
 
   float dx = 0;
   float dy = 0;
+  jugadorCaminando = false;
 
 
   // ==========================================
@@ -1201,9 +1203,12 @@ void moverJugador() {
   // ==========================================
   // VELOCIDAD EN DIAGONAL
   // ==========================================
-
+  if (dx != 0 || dy != 0) {
+    jugadorCaminando = true;
+    animacionCaminar += 0.25;
+  }
   if (dx != 0 && dy != 0) {
-
+  
     float magnitud = sqrt(dx * dx + dy * dy);
 
     if (magnitud > 1) {
@@ -1266,19 +1271,34 @@ boolean colisiona(float x, float y) {
 
 void dibujarJugador() {
   noStroke();
+    // ==========================================
+  // ANIMACIÓN DE CAMINAR
+  // ==========================================
+
+  float movimientoPiernas = 0;
+  float movimientoBrazos = 0;
+
+  if (jugadorCaminando) {
+
+    movimientoPiernas =
+      sin(animacionCaminar) * 5;
+
+    movimientoBrazos =
+      sin(animacionCaminar) * 4;
+  }
   fill(70, 70, 70, 120);
   ellipse(jugadorX, jugadorY + 22, 32, 10);
 
   fill(40, 50, 80);
-  rect(jugadorX - 10, jugadorY + 8, 8, 18);
-  rect(jugadorX + 2, jugadorY + 8, 8, 18);
+  rect(jugadorX - 10, jugadorY + 8 + movimientoPiernas, 8, 18);
+  rect(jugadorX + 2, jugadorY + 8 - movimientoPiernas, 8, 18);
 
   fill(160, 70, 210);
   rect(jugadorX - 14, jugadorY - 15, 28, 25, 5);
 
   fill(230, 180, 140);
-  rect(jugadorX - 18, jugadorY - 10, 5, 18, 3);
-  rect(jugadorX + 13, jugadorY - 10, 5, 18, 3);
+  rect(jugadorX - 18, jugadorY - 10 - movimientoBrazos, 5, 18, 3);
+  rect(jugadorX + 13, jugadorY - 10 + movimientoBrazos , 5, 18, 3);
 
   fill(230, 180, 140);
   ellipse(jugadorX, jugadorY - 27, 25, 25);

@@ -159,7 +159,7 @@ void draw() {
   textSize(14);
   textAlign(LEFT);
   fill(255);
-  text("1: Barrio   2: Colegio   3: Plaza     WASD: Moverse     C: Conecta (Red Social)     H: Colisiones", 15, 390);
+  text("1: Barrio   2: Colegio   3: Plaza     WASD: Moverse     C: Conecta (Red Social) ", 15, 390);
 
   mostrarIndicadores();
 
@@ -1090,10 +1090,6 @@ void keyPressed() {
     redSocialAbierta = !redSocialAbierta;
   }
 
-  // Mostrar / ocultar colisiones (depuración)
-  if (key == 'h' || key == 'H') {
-    verColisiones = !verColisiones;
-  }
 
   // Si la red social está abierta, responder con números 1, 2, 3
   if (redSocialAbierta) {

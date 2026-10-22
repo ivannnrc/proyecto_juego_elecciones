@@ -6,6 +6,14 @@ ControlDevice mando;
 
 ControlSlider joystickX;
 ControlSlider joystickY;
+ControlButton botonCuadrado;
+ControlHat cruceta;
+
+boolean cuadradoPresionadoAntes = false;
+
+boolean izquierdaAntes = false;
+boolean arribaAntes = false;
+boolean derechaAntes = false;
 
 boolean mandoConectado = false;
 
@@ -113,10 +121,15 @@ void setup() {
     println("MANDO ENCONTRADO: " + mando.getName());
 
     joystickX = mando.getSlider(0);
-    joystickY = mando.getSlider(1);
+joystickY = mando.getSlider(1);
 
-    mandoConectado = true;
+// BOTÓN CUADRADO
+botonCuadrado = mando.getButton(4);
 
+// CRUCETA
+cruceta = mando.getHat(0);
+
+mandoConectado = true;
   } else {
 
     println("NO SE ENCONTRO EL MANDO");
@@ -128,6 +141,21 @@ void setup() {
 // DRAW
 
 void draw() {
+  // ==========================================
+// CUADRADO = ABRIR / CERRAR CONECTA
+// ==========================================
+
+if (mandoConectado) {
+
+  boolean cuadradoAhora = botonCuadrado.pressed();
+
+  if (cuadradoAhora && !cuadradoPresionadoAntes) {
+
+    redSocialAbierta = !redSocialAbierta;
+  }
+
+  cuadradoPresionadoAntes = cuadradoAhora;
+}
 
   // 1. MOVER JUGADOR Y ACTUALIZAR CÁMARA
   if (!redSocialAbierta) {

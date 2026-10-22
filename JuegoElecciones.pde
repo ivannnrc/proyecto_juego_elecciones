@@ -106,9 +106,7 @@ void setup() {
     if (
       nombre.contains("wireless controller") ||
       nombre.contains("dualshock") ||
-      nombre.contains("ps4") ||
-      nombre.contains("xbox") ||
-      nombre.contains("xinput")
+      nombre.contains("ps4")
     ) {
 
       mando = dispositivo;

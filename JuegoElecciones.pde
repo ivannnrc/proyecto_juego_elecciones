@@ -88,6 +88,38 @@ boolean moverIzquierda = false;
 boolean moverDerecha = false;
 boolean jugadorCaminando = false;
 
+// =====================================================
+// SISTEMA DE BUSES Y TRANSICIONES (EXTRAÍDO)
+// =====================================================
+
+// BUS BARRIO -> COLEGIO
+float busX = -180;
+float busY = 430;
+float velocidadBus = 3.0;
+float paradaBusX = 1450;
+boolean busDetenido = false;
+boolean busYaParo = false;
+int tiempoBusDetenido = 0;
+boolean cercaDelBus = false;
+boolean viajandoEnBus = false;
+float oscuridadTransicion = 0;
+
+// BUS COLEGIO -> PLAZA
+float busPlazaX = -180;
+float busPlazaY = 570;
+float velocidadBusPlaza = 3.0;
+float paradaBusPlazaX = 1000;
+boolean busPlazaDetenido = false;
+boolean busPlazaYaParo = false;
+int tiempoBusPlazaDetenido = 0;
+boolean cercaBusPlaza = false;
+boolean viajandoAPlaza = false;
+float oscuridadPlaza = 0;
+
+// Botón X del control para abordar el bus
+ControlButton botonX;
+boolean xPresionadoAntes = false;
+
 // SETUP
 
 void setup() {
@@ -122,6 +154,7 @@ void setup() {
     botonL1 = mando.getButton(5);
     botonR1 = mando.getButton(6);
     botonL2 = mando.getButton(7);
+    botonX = mando.getButton(2);
 
     mandoConectado = true;
   } else {
@@ -133,7 +166,22 @@ void setup() {
 // DRAW
 
 void draw() {
-  // ABRIR / CERRAR CONECTA CON MANDO
+  // 1. ACTUALIZACIONES LÓGICAS (BUSES Y MOVIMIENTO)
+  actualizarBus();
+  actualizarBusPlaza();
+  revisarInteraccionBus();
+  revisarInteraccionBusPlaza();
+
+  // Movimiento del jugador
+  if (!redSocialAbierta && !dialogoActivo && !viajandoEnBus && !viajandoAPlaza) {
+    moverJugador();
+  }
+
+  // Actualizar cámara y transiciones de escenario por mapa
+  actualizarCamara();
+  revisarCambioEscenario();
+
+  // Control para abrir Conecta
   if (mandoConectado) {
     boolean cuadradoAhora = botonCuadrado.pressed();
     if (cuadradoAhora && !cuadradoPresionadoAntes) {
@@ -142,6 +190,7 @@ void draw() {
     cuadradoPresionadoAntes = cuadradoAhora;
   }
 
+  // Control dentro de Conecta
   if (mandoConectado && redSocialAbierta) {
     boolean l1Ahora = botonL1.pressed();
     boolean r1Ahora = botonR1.pressed();
@@ -160,25 +209,19 @@ void draw() {
     l2PresionadoAntes = l2Ahora;
   }
 
-  // MOVIMIENTO DEL JUGADOR
-  if (!redSocialAbierta && !dialogoActivo) {
-    moverJugador();
-  }
-
-  actualizarCamara();
-  revisarCambioEscenario();
-
-  // 1. DIBUJAR EL MUNDO DESPLAZADO POR LA CÁMARA
+  // 2. DIBUJAR MUNDO (AFECTADO POR LA CÁMARA)
   noStroke();
   strokeWeight(1);
   pushMatrix();
-  translate(-round(camX), -round(camY));
+  translate(-round(camX), -round(camY)); // Aplica la cámara a todo el mundo 2D
   
   pushStyle();
   if (escenario == 1) {
     fondoBarrio();
+    dibujarBus();       // El bus debe dibujarse en las coordenadas del mundo
   } else if (escenario == 2) {
     fondoColegio();
+    dibujarBusPlaza();  // Bus del Colegio en las coordenadas del mundo
   } else {
     fondoPlaza();
   }
@@ -188,30 +231,34 @@ void draw() {
   dibujarObjetosYJugador();
   if (verColisiones) dibujarColisiones();
   
-  // DIBUJAR INDICADOR FLOTANTE SOBRE EL NPC (Dentro de la transformación de la cámara)
+  // Indicador flotante sobre los NPCs
   gestionarNPCsPorEscenario();
   popStyle();
 
-  popMatrix();
+  popMatrix(); // Fin de la cámara
 
-  // 2. TEXTO DE CONTROLES E INDICADORES (HUD fijo en pantalla)
+  // 3. INTERFAZ Y HUD (DIBUJADOS EN PANTALLA FIJA)
   noStroke();
   fill(0, 150);
   rect(0, 372, width, 28);
   textSize(14);
   textAlign(LEFT);
   fill(255);
-  text("1: Barrio   2: Colegio   3: Plaza     WASD: Moverse     E: Hablar     C: Conecta", 15, 390);
+  text("1: Barrio   2: Colegio   3: Plaza     WASD: Moverse     E: Hablar     F/X: Bus     C: Conecta", 15, 390);
 
   mostrarIndicadores();
 
-  // 3. INTERFAZ DE RED SOCIAL
+  // Red social Conecta
   gestionarRedSocialGUI();
 
-  // 4. DIBUJAR CUADRO DE DIÁLOGO (Si está activo)
+  // Diálogos con NPCs
   if (dialogoActivo) {
     dibujarDialogo();
   }
+
+  // Transiciones a negro al viajar en bus
+  actualizarViajeBus();
+  actualizarViajePlaza();
 }
 
 // =====================================================
@@ -1295,3 +1342,148 @@ void gestionarNPCsPorEscenario() {
   }
 }
 
+void actualizarBus() {
+  if (escenario != 1 || viajandoEnBus) return;
+
+  if (busDetenido) {
+    tiempoBusDetenido++;
+    if (tiempoBusDetenido > 240) busDetenido = false;
+  } else {
+    busX += velocidadBus;
+    if (!busYaParo && busX >= paradaBusX) {
+      busX = paradaBusX;
+      busDetenido = true;
+      busYaParo = true;
+      tiempoBusDetenido = 0;
+    }
+    if (busX > mundoW + 180) {
+      busX = -180;
+      busYaParo = false;
+      busDetenido = false;
+      tiempoBusDetenido = 0;
+    }
+  }
+}
+
+void actualizarBusPlaza() {
+  if (escenario != 2 || viajandoAPlaza) return;
+
+  if (busPlazaDetenido) {
+    tiempoBusPlazaDetenido++;
+    if (tiempoBusPlazaDetenido > 240) busPlazaDetenido = false;
+  } else {
+    busPlazaX += velocidadBusPlaza;
+    if (!busPlazaYaParo && busPlazaX >= paradaBusPlazaX) {
+      busPlazaX = paradaBusPlazaX;
+      busPlazaDetenido = true;
+      busPlazaYaParo = true;
+      tiempoBusPlazaDetenido = 0;
+    }
+    if (busPlazaX > mundoW + 180) {
+      busPlazaX = -180;
+      busPlazaYaParo = false;
+      busPlazaDetenido = false;
+      tiempoBusPlazaDetenido = 0;
+    }
+  }
+}
+
+void dibujarBus() {
+  if (escenario != 1) return;
+  pushStyle();
+  rectMode(CENTER);
+  noStroke(); fill(0, 50); ellipse(busX, busY + 43, 220, 25); // Sombra
+  fill(245, 190, 40); rect(busX, busY, 220, 82, 14); // Cuerpo
+  fill(220, 145, 20); rect(busX, busY + 25, 220, 30);
+  fill(120, 190, 220);
+  rect(busX - 70, busY - 15, 42, 28, 5);
+  rect(busX - 20, busY - 15, 42, 28, 5);
+  rect(busX + 30, busY - 15, 42, 28, 5);
+  fill(75, 125, 150); rect(busX + 82, busY + 3, 30, 58, 4);
+  fill(35); ellipse(busX - 70, busY + 42, 36, 36); ellipse(busX + 70, busY + 42, 36, 36);
+  fill(130); ellipse(busX - 70, busY + 42, 15, 15); ellipse(busX + 70, busY + 42, 15, 15);
+  fill(255); textAlign(CENTER, CENTER); textSize(13);
+  text("COLEGIO NOVA", busX, busY + 15);
+  rectMode(CORNER);
+  popStyle();
+}
+
+void dibujarBusPlaza() {
+  if (escenario != 2) return;
+  pushStyle();
+  rectMode(CENTER);
+  noStroke(); fill(0, 50); ellipse(busPlazaX, busPlazaY + 43, 220, 25);
+  fill(70, 120, 210); rect(busPlazaX, busPlazaY, 220, 82, 14);
+  fill(40, 80, 170); rect(busPlazaX, busPlazaY + 25, 220, 30);
+  fill(120, 190, 220);
+  rect(busPlazaX - 70, busPlazaY - 15, 42, 28, 5);
+  rect(busPlazaX - 20, busPlazaY - 15, 42, 28, 5);
+  rect(busPlazaX + 30, busPlazaY - 15, 42, 28, 5);
+  fill(75, 125, 150); rect(busPlazaX + 82, busPlazaY + 3, 30, 58, 4);
+  fill(35); ellipse(busPlazaX - 70, busPlazaY + 42, 36, 36); ellipse(busPlazaX + 70, busPlazaY + 42, 36, 36);
+  fill(130); ellipse(busPlazaX - 70, busPlazaY + 42, 15, 15); ellipse(busPlazaX + 70, busPlazaY + 42, 15, 15);
+  fill(255); textAlign(CENTER, CENTER); textSize(13);
+  text("PLAZA NOVA", busPlazaX, busPlazaY + 15);
+  rectMode(CORNER);
+  popStyle();
+}
+
+void revisarInteraccionBus() {
+  cercaDelBus = false;
+  if (escenario == 1 && busDetenido) {
+    if (dist(jugadorX, jugadorY, busX + 75, busY + 25) < 105) cercaDelBus = true;
+  }
+
+  // Tecla F o Botón X para subir al bus
+  boolean accionSube = (keyPressed && (key == 'f' || key == 'F')) || (mandoConectado && botonX.pressed());
+
+  if (cercaDelBus && accionSube && !xPresionadoAntes && !viajandoEnBus) {
+    viajandoEnBus = true;
+    xPresionadoAntes = true;
+  } else if (!accionSube) {
+    xPresionadoAntes = false;
+  }
+}
+
+void revisarInteraccionBusPlaza() {
+  cercaBusPlaza = false;
+  if (escenario == 2 && busPlazaDetenido) {
+    if (dist(jugadorX, jugadorY, busPlazaX + 75, busPlazaY + 25) < 105) cercaBusPlaza = true;
+  }
+
+  boolean accionSube = (keyPressed && (key == 'f' || key == 'F')) || (mandoConectado && botonX.pressed());
+
+  if (cercaBusPlaza && accionSube && !xPresionadoAntes && !viajandoAPlaza) {
+    viajandoAPlaza = true;
+    xPresionadoAntes = true;
+  } else if (!accionSube) {
+    xPresionadoAntes = false;
+  }
+}
+
+void actualizarViajeBus() {
+  if (!viajandoEnBus) return;
+  oscuridadTransicion += 6;
+  fill(0, constrain(oscuridadTransicion, 0, 255));
+  noStroke(); rect(0, 0, width, height);
+
+  if (oscuridadTransicion >= 255) {
+    cargarEscenario(2);
+    jugadorX = 1000; jugadorY = 850;
+    viajandoEnBus = false; oscuridadTransicion = 0;
+  }
+}
+
+void actualizarViajePlaza() {
+  if (!viajandoAPlaza) return;
+  oscuridadPlaza += 6;
+  fill(0, constrain(oscuridadPlaza, 0, 255));
+  noStroke(); rect(0, 0, width, height);
+
+  if (oscuridadPlaza >= 255) {
+    cargarEscenario(3);
+    jugadorX = 1100; jugadorY = 700;
+    viajandoAPlaza = false; oscuridadPlaza = 0;
+    busPlazaX = -180; busPlazaDetenido = false; busPlazaYaParo = false;
+  }
+}

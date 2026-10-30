@@ -26,6 +26,8 @@ boolean dialogoActivo = false;
 String hablanteActual = "";
 String textoDialogoActual = "";
 
+int misionActual = 1;
+
 // =====================================================
 // NOVA / CONECTA - versión con mundos amplios y cámara
 // =====================================================
@@ -1519,6 +1521,46 @@ void comprobarInteraccionNPC(float xNPC, float yNPC, String nombre, String mensa
   float distancia = dist(jugadorX, jugadorY, xNPC, yNPC);
 
   if (distancia < 50 && keyPressed && (key == 'e' || key == 'E')) {
+    hablanteActual = nombre;
+    textoDialogoActual = mensaje;
+    dialogoActivo = true;
+  }
+}
+
+void actualizarMision(int nuevaMision) {
+  if (nuevaMision < 1 || nuevaMision > 3) {
+    return;
+  }
+
+  misionActual = nuevaMision;
+
+  switch (misionActual) {
+    case 1:
+      hablanteActual = "Vecina del barrio";
+      textoDialogoActual = "Se rumorea que algo importante está ocurriendo en el barrio.";
+      break;
+
+    case 2:
+      hablanteActual = "Estudiante del colegio";
+      textoDialogoActual = "Alguien publicó una foto del colegio sin permiso.";
+      break;
+
+    case 3:
+      hablanteActual = "Candidato electoral";
+      textoDialogoActual = "La plaza electoral está lista para escuchar a la comunidad.";
+      break;
+  }
+
+  dialogoActivo = true;
+}
+
+boolean estaCercaDeNPC(float npcX, float npcY, float radio) {
+  return dist(jugadorX, jugadorY, npcX, npcY) < radio;
+}
+
+void procesarInteraccionNPC(float npcX, float npcY, String nombre, String mensaje) {
+  if (estaCercaDeNPC(npcX, npcY, 50) &&
+      keyPressed && (key == 'e' || key == 'E')) {
     hablanteActual = nombre;
     textoDialogoActual = mensaje;
     dialogoActivo = true;

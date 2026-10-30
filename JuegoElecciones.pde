@@ -22,6 +22,10 @@ boolean derechaAntes = false;
 
 boolean mandoConectado = false;
 
+boolean dialogoActivo = false;
+String hablanteActual = "";
+String textoDialogoActual = "";
+
 // =====================================================
 // NOVA / CONECTA - versión con mundos amplios y cámara
 // =====================================================
@@ -1491,4 +1495,32 @@ void cambiarIndicadores(
   bienestar = constrain(bienestar, 0, 100);
   participacion = constrain(participacion, 0, 100);
   reputacion = constrain(reputacion, 0, 100);
+}
+void dibujarDialogo() {
+  if (!dialogoActivo) {
+    return;
+  }
+
+  fill(0, 0, 0, 180);
+  noStroke();
+  rect(20, 280, 960, 90, 12);
+
+  fill(255, 220, 0);
+  textSize(20);
+  textAlign(LEFT, TOP);
+  text(hablanteActual, 40, 295);
+
+  fill(255);
+  textSize(16);
+  text(textoDialogoActual, 40, 325, 920, 35);
+}
+
+void comprobarInteraccionNPC(float xNPC, float yNPC, String nombre, String mensaje) {
+  float distancia = dist(jugadorX, jugadorY, xNPC, yNPC);
+
+  if (distancia < 50 && keyPressed && (key == 'e' || key == 'E')) {
+    hablanteActual = nombre;
+    textoDialogoActual = mensaje;
+    dialogoActivo = true;
+  }
 }

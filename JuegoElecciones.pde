@@ -3875,7 +3875,7 @@ void dibujarMinijuegoPlaza() {
   textSize(20);
   text(
     comentariosPlaza[comentarioActualPlaza],
-    width / 2,
+    170,
     225,
     width - 340,
     100

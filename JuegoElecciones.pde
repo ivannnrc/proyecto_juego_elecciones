@@ -207,6 +207,49 @@ int[] puntoPublicacionColegio = {
 };
 
 // =====================================================
+// MINIJUEGO 3 - DEBATE CIUDADANO EN PLAZA NOVA
+// =====================================================
+
+// Estado general del minijuego
+boolean minijuegoPlazaActivo = false;
+boolean minijuegoPlazaTerminado = false;
+
+// Comentarios sobre el debate ciudadano
+String[] comentariosPlaza = {
+  "El debate comenzó puntual y todas las candidaturas presentaron sus propuestas.",
+  "URGENTE: un candidato abandonó el debate después de ser descubierto mintiendo.",
+  "La propuesta de movilidad fue respaldada por organizaciones vecinales.",
+  "BOT_NOVA: comparte este mensaje y recibirás un premio por apoyar al candidato.",
+  "La periodista Laura confirmó que el foro continuará abierto a preguntas del público.",
+  "Miles de personas aseguran que el resultado ya fue decidido, pero nadie presenta pruebas."
+};
+
+// Indica si cada comentario fue publicado por un bot
+boolean[] respuestaCorrectaPlaza = {
+  false,
+  true,
+  false,
+  true,
+  false,
+  true
+};
+
+// Periodista Laura
+float npcLauraX = 880;
+float npcLauraY = 300;
+boolean cercaNpcLaura = false;
+boolean dialogoLauraActivo = false;
+int dialogoLaura = 0;
+boolean cuadradoLauraAntes = false;
+boolean l1PlazaAntes = false;
+boolean r1PlazaAntes = false;
+
+// Progreso del minijuego
+int aciertosPlaza = 0;
+int desaciertosPlaza = 0;
+int comentarioActualPlaza = -1;
+
+// =====================================================
 // 6. JUGADOR - VARIABLES
 // =====================================================
 
@@ -416,9 +459,12 @@ void draw() {
   actualizarControlRedSocial();
   revisarInteraccionNpcBombero();
   controlarDialogoBombero();
+  revisarInteraccionNpcLaura();
+  controlarDialogoLaura();
   revisarIncendioCercano();
   apagarIncendio();
   actualizarMinijuegoIncendios();
+  actualizarMinijuegoPlaza();
   actualizarBus();
   actualizarBusPlaza();
   revisarInteraccionBus();
@@ -452,6 +498,8 @@ void draw() {
   mostrarMensajeIncendio();
   dibujarHUDIncendios();
   dibujarDialogoBombero();
+  dibujarDialogoLaura();
+  dibujarMinijuegoPlaza();
   actualizarViajeBus();
   actualizarViajePlaza();
   revisarPuntoAcopioColegio();
@@ -629,6 +677,7 @@ void dibujarMundo() {
   } else {
 
     fondoPlaza();
+    dibujarNpcLaura();
   }
 
   popStyle();
@@ -2009,7 +2058,11 @@ void revisarInteraccionBus() {
 
   cercaDelBus = false;
 
-  if (escenario == 1 && busDetenido) {
+  if (
+    escenario == 1 &&
+    busDetenido &&
+    minijuegoIncendiosTerminado
+  ) {
 
     float distanciaBus = dist(
       jugadorX,
@@ -2023,7 +2076,11 @@ void revisarInteraccionBus() {
     }
   }
 
-  if (mandoConectado && cercaDelBus) {
+  if (
+    mandoConectado &&
+    cercaDelBus &&
+    minijuegoIncendiosTerminado
+  ) {
 
     boolean xAhora = botonX.pressed();
 
@@ -2259,7 +2316,11 @@ void revisarInteraccionBusPlaza() {
   cercaBusPlaza = false;
 
   // Detectar si el jugador está cerca del bus
-  if (escenario == 2 && busPlazaDetenido) {
+  if (
+    escenario == 2 &&
+    busPlazaDetenido &&
+    crisisColegioCompletadas >= 3
+  ) {
 
     float distanciaBusPlaza = dist(
       jugadorX,
@@ -2277,7 +2338,8 @@ void revisarInteraccionBusPlaza() {
   if (
     mandoConectado &&
     cercaBusPlaza &&
-    !viajandoAPlaza
+    !viajandoAPlaza &&
+    crisisColegioCompletadas >= 3
   ) {
 
     boolean xAhora = botonX.pressed();
@@ -3581,4 +3643,323 @@ void procesarDecisionColegio(int opcion) {
   println(
     "CRISIS DEL COLEGIO RESUELTA: " + i
   );
+}
+
+// =====================================================
+// 30. MINIJUEGO - DEBATE CIUDADANO EN PLAZA NOVA
+// =====================================================
+
+void iniciarMinijuegoPlaza() {
+  aciertosPlaza = 0;
+  desaciertosPlaza = 0;
+  comentarioActualPlaza = 0;
+  minijuegoPlazaActivo = true;
+  minijuegoPlazaTerminado = false;
+  l1PlazaAntes = false;
+  r1PlazaAntes = false;
+}
+
+void revisarInteraccionNpcLaura() {
+  cercaNpcLaura = false;
+
+  if (escenario != 3) {
+    return;
+  }
+
+  float distanciaLaura = dist(
+    jugadorX,
+    jugadorY,
+    npcLauraX,
+    npcLauraY
+  );
+
+  if (distanciaLaura < 80) {
+    cercaNpcLaura = true;
+  }
+}
+
+void controlarDialogoLaura() {
+  if (!mandoConectado) {
+    return;
+  }
+
+  boolean cuadradoAhora = botonCuadrado.pressed();
+
+  if (
+    escenario == 3 &&
+    cercaNpcLaura &&
+    !minijuegoPlazaActivo &&
+    cuadradoAhora &&
+    !cuadradoLauraAntes
+  ) {
+    if (!dialogoLauraActivo) {
+      dialogoLauraActivo = true;
+      dialogoLaura = 1;
+    } else if (crisisColegioCompletadas < 3) {
+      dialogoLauraActivo = false;
+      dialogoLaura = 0;
+    } else {
+      dialogoLaura++;
+
+      if (dialogoLaura > 3) {
+        dialogoLauraActivo = false;
+        dialogoLaura = 0;
+        iniciarMinijuegoPlaza();
+      }
+    }
+  }
+
+  cuadradoLauraAntes = cuadradoAhora;
+}
+
+void dibujarDialogoLaura() {
+  if (!dialogoLauraActivo) {
+    return;
+  }
+
+  pushStyle();
+
+  fill(0, 210);
+  noStroke();
+  rect(
+    80,
+    250,
+    width - 160,
+    125,
+    12
+  );
+
+  noFill();
+  stroke(255);
+  strokeWeight(2);
+  rect(
+    80,
+    250,
+    width - 160,
+    125,
+    12
+  );
+
+  noStroke();
+  fill(255, 210, 60);
+  textAlign(LEFT, TOP);
+  textSize(28);
+  text("Laura", 100, 265);
+
+  fill(255);
+  textSize(20);
+
+  if (crisisColegioCompletadas < 3) {
+    text(
+      "Primero debes resolver los problemas del Colegio.",
+      100,
+      300
+    );
+  } else if (dialogoLaura == 1) {
+    text(
+      "En este debate circulan comentarios reales y mensajes de bots.",
+      100,
+      300
+    );
+  } else if (dialogoLaura == 2) {
+    text(
+      "Analiza cada comentario y decide si viene de un ciudadano real.",
+      100,
+      300
+    );
+  } else if (dialogoLaura == 3) {
+    text(
+      "Usa L1 para Ciudadano Real y R1 para Bot / Desinformación.",
+      100,
+      300
+    );
+  }
+
+  fill(200);
+  textAlign(RIGHT, BOTTOM);
+  textSize(12);
+  text("□ Continuar", width - 100, 360);
+
+  popStyle();
+}
+
+void actualizarMinijuegoPlaza() {
+  if (!minijuegoPlazaActivo) {
+    l1PlazaAntes = false;
+    r1PlazaAntes = false;
+    return;
+  }
+
+  if (!mandoConectado) {
+    return;
+  }
+
+  boolean l1Ahora = botonL1.pressed();
+  boolean r1Ahora = botonR1.pressed();
+
+  if (l1Ahora && !l1PlazaAntes) {
+    evaluarComentarioPlaza(false);
+  } else if (r1Ahora && !r1PlazaAntes) {
+    evaluarComentarioPlaza(true);
+  }
+
+  l1PlazaAntes = l1Ahora;
+  r1PlazaAntes = r1Ahora;
+}
+
+void evaluarComentarioPlaza(boolean respuestaBot) {
+  if (
+    comentarioActualPlaza < 0 ||
+    comentarioActualPlaza >= comentariosPlaza.length
+  ) {
+    return;
+  }
+
+  if (respuestaBot == respuestaCorrectaPlaza[comentarioActualPlaza]) {
+    aciertosPlaza++;
+  } else {
+    desaciertosPlaza++;
+  }
+
+  comentarioActualPlaza++;
+
+  if (comentarioActualPlaza >= comentariosPlaza.length) {
+    minijuegoPlazaActivo = false;
+    minijuegoPlazaTerminado = true;
+    aplicarResultadoPlaza();
+  }
+}
+
+void dibujarMinijuegoPlaza() {
+  if (
+    !minijuegoPlazaActivo ||
+    comentarioActualPlaza < 0 ||
+    comentarioActualPlaza >= comentariosPlaza.length
+  ) {
+    return;
+  }
+
+  pushStyle();
+
+  noStroke();
+  fill(0, 220);
+  rect(
+    120,
+    120,
+    width - 240,
+    420,
+    14
+  );
+
+  fill(255);
+  textAlign(CENTER, TOP);
+  textSize(22);
+  text(
+    "DEBATE CIUDADANO - PLAZA NOVA",
+    width / 2,
+    145
+  );
+
+  fill(220);
+  textSize(13);
+  text(
+    "Comentario " +
+    (comentarioActualPlaza + 1) +
+    " de " +
+    comentariosPlaza.length,
+    width / 2,
+    180
+  );
+
+  fill(255);
+  textSize(20);
+  text(
+    comentariosPlaza[comentarioActualPlaza],
+    width / 2,
+    225,
+    width - 340,
+    100
+  );
+
+  fill(80, 160, 220);
+  rect(
+    width / 2 - 260,
+    400,
+    220,
+    55,
+    10
+  );
+
+  fill(220, 90, 90);
+  rect(
+    width / 2 + 40,
+    400,
+    220,
+    55,
+    10
+  );
+
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textSize(16);
+  text("L1  Ciudadano Real", width / 2 - 150, 428);
+  text("R1  Bot / Desinformación", width / 2 + 150, 428);
+
+  popStyle();
+}
+
+void aplicarResultadoPlaza() {
+  if (aciertosPlaza >= 5) {
+    cambiarIndicadores(
+      +15,
+      +10,
+      +10,
+      +15,
+      +15
+    );
+    println("RESULTADO PLAZA: EXCELENTE");
+  } else if (aciertosPlaza >= 3) {
+    cambiarIndicadores(
+      +5,
+      +5,
+      +5,
+      +5,
+      +5
+    );
+    println("RESULTADO PLAZA: REGULAR");
+  } else {
+    cambiarIndicadores(
+      -10,
+      -5,
+      -5,
+      -10,
+      -15
+    );
+    println("RESULTADO PLAZA: MALO");
+  }
+}
+
+void dibujarNpcLaura() {
+  pushStyle();
+
+  noStroke();
+  fill(0, 50);
+  ellipse(npcLauraX, npcLauraY + 34, 32, 10);
+
+  fill(40);
+  rect(npcLauraX - 8, npcLauraY + 15, 6, 20);
+  rect(npcLauraX + 2, npcLauraY + 15, 6, 20);
+
+  fill(80, 130, 200);
+  rect(npcLauraX - 13, npcLauraY - 8, 26, 25, 4);
+
+  fill(230, 180, 140);
+  ellipse(npcLauraX, npcLauraY - 18, 22, 22);
+
+  fill(255, 230, 70);
+  textAlign(CENTER);
+  textSize(20);
+  text("L", npcLauraX, npcLauraY - 42);
+
+  popStyle();
 }

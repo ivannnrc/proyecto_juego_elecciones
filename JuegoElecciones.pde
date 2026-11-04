@@ -29,12 +29,11 @@ ControlButton botonL1;
 ControlButton botonR1;
 ControlButton botonL2;
 
-
 boolean cuadradoPresionadoAntes = false;
 boolean l1PresionadoAntes = false;
 boolean r1PresionadoAntes = false;
 boolean l2PresionadoAntes = false;
-boolean XpresionadoAntes= false;
+boolean XpresionadoAntes = false;
 
 boolean mandoConectado = false;
 
@@ -133,7 +132,6 @@ boolean[] crisisColegioResuelta = {
 // Cantidad de crisis resueltas
 int crisisColegioCompletadas = 0;
 
-
 // =====================================================
 // PUNTOS DE ACOPIO DEL COLEGIO
 // =====================================================
@@ -151,7 +149,6 @@ float[][] puntosAcopioColegio = {
   {1500, 380}   // Cancha
 };
 
-
 // Nombres que aparecerán en Conecta
 String[] nombresPuntosColegio = {
 
@@ -161,7 +158,6 @@ String[] nombresPuntosColegio = {
 
   "CANCHA"
 };
-
 
 // =====================================================
 // PUBLICACIONES DEL MINIJUEGO
@@ -176,7 +172,6 @@ String[] publicacionesColegio = {
   "URGENTE: suspendieron el foro electoral por disturbios"
 };
 
-
 // Autor de cada publicación
 String[] autoresColegio = {
 
@@ -187,7 +182,6 @@ String[] autoresColegio = {
   "@alerta_nova"
 };
 
-
 // Viralidad inicial
 float[] viralidadColegio = {
 
@@ -197,7 +191,6 @@ float[] viralidadColegio = {
 
   45
 };
-
 
 // Relación entre publicación y punto de acopio
 // publicación 0 -> auditorio
@@ -270,37 +263,31 @@ boolean minijuegoIncendiosTerminado = false;
 // INCENDIOS DEL MINIJUEGO
 float[][] incendios = {
 
-  
   {180, 610},
   {340, 780},
   {520, 620},
   {680, 840},
 
-  
   {760, 660},
   {880, 820},
   {1020, 610},
   {1150, 760},
 
- 
   {1280, 650},
   {1400, 820},
   {1530, 570},
   {1630, 760},
 
-  
   {1740, 650},
   {1840, 810},
   {1950, 640},
   {2050, 800},
 
-  
   {2160, 590},
   {2280, 720},
   {2400, 610},
   {2500, 800},
 
-  
   {250, 840},
   {1080, 850},
   {1480, 690},
@@ -401,16 +388,15 @@ void setup() {
 
     joystickX = mando.getSlider(3);
     joystickY = mando.getSlider(2);
-    
 
     // BOTONES DEL CONTROL
     botonTriangulo = mando.getButton(4);
-botonCuadrado = mando.getButton(1);
-botonX = mando.getButton(2);
+    botonCuadrado = mando.getButton(1);
+    botonX = mando.getButton(2);
 
-botonL1 = mando.getButton(5);
-botonR1 = mando.getButton(6);
-botonL2 = mando.getButton(7);
+    botonL1 = mando.getButton(5);
+    botonR1 = mando.getButton(6);
+    botonL2 = mando.getButton(7);
 
     mandoConectado = true;
   } else {
@@ -431,27 +417,24 @@ void draw() {
   revisarInteraccionNpcBombero();
   controlarDialogoBombero();
   revisarIncendioCercano();
-apagarIncendio();
-actualizarMinijuegoIncendios();
+  apagarIncendio();
+  actualizarMinijuegoIncendios();
   actualizarBus();
   actualizarBusPlaza();
   revisarInteraccionBus();
   revisarInteraccionBusPlaza();
-  
-  
-  
 
   // 2. MOVER JUGADOR
   if (
-  !redSocialAbierta &&
-  !viajandoEnBus &&
-  !viajandoAPlaza
-) {
+    !redSocialAbierta &&
+    !viajandoEnBus &&
+    !viajandoAPlaza
+  ) {
 
-  moverJugador();
+    moverJugador();
 
-  revisarCambioEscenario();
-}
+    revisarCambioEscenario();
+  }
 
   // 3. ACTUALIZAR CÁMARA
   actualizarCamara();
@@ -460,7 +443,7 @@ actualizarMinijuegoIncendios();
   dibujarMundo();
 
   // 5. HUD E INDICADORES
-  
+
   mostrarIndicadores();
 
   // 6. INTERFAZ DE RED SOCIAL
@@ -473,7 +456,7 @@ actualizarMinijuegoIncendios();
   actualizarViajePlaza();
   revisarPuntoAcopioColegio();
   comprobarSituacionColegio();
-  
+
 }
 
 // =====================================================
@@ -495,92 +478,92 @@ void actualizarControlRedSocial() {
 
   cuadradoPresionadoAntes = cuadradoAhora;
 
-// =====================================================
-// DECISIÓN FINAL DEL MINIJUEGO DEL COLEGIO
-// =====================================================
+  // =====================================================
+  // DECISIÓN FINAL DEL MINIJUEGO DEL COLEGIO
+  // =====================================================
 
-if (
-  escenario == 2 &&
-  minijuegoColegioActivo &&
-  publicacionColegioActual != -1 &&
-  publicacionVerificadaColegio[publicacionColegioActual]
-) {
+  if (
+    escenario == 2 &&
+    minijuegoColegioActivo &&
+    publicacionColegioActual != -1 &&
+    publicacionVerificadaColegio[publicacionColegioActual]
+  ) {
 
-  boolean l1Ahora = botonL1.pressed();
-  boolean r1Ahora = botonR1.pressed();
-  boolean l2Ahora = botonL2.pressed();
+    boolean l1Ahora = botonL1.pressed();
+    boolean r1Ahora = botonR1.pressed();
+    boolean l2Ahora = botonL2.pressed();
 
-  if (l1Ahora && !l1PresionadoAntes) {
-    procesarDecisionColegio(1);
+    if (l1Ahora && !l1PresionadoAntes) {
+      procesarDecisionColegio(1);
+    }
+
+    else if (r1Ahora && !r1PresionadoAntes) {
+      procesarDecisionColegio(2);
+    }
+
+    else if (l2Ahora && !l2PresionadoAntes) {
+      procesarDecisionColegio(3);
+    }
+
+    l1PresionadoAntes = l1Ahora;
+    r1PresionadoAntes = r1Ahora;
+    l2PresionadoAntes = l2Ahora;
+
+    return;
   }
-
-  else if (r1Ahora && !r1PresionadoAntes) {
-    procesarDecisionColegio(2);
-  }
-
-  else if (l2Ahora && !l2PresionadoAntes) {
-    procesarDecisionColegio(3);
-  }
-
-  l1PresionadoAntes = l1Ahora;
-  r1PresionadoAntes = r1Ahora;
-  l2PresionadoAntes = l2Ahora;
-
-  return;
-}
   // L1 / R1 / L2 SOLO CUANDO CONECTA ESTÁ ABIERTA
- 
+
   if (redSocialAbierta) {
     // =====================================================
-// SELECCIONAR CRISIS DEL COLEGIO
-// =====================================================
+    // SELECCIONAR CRISIS DEL COLEGIO
+    // =====================================================
 
-if (
-  escenario == 2 &&
-  minijuegoColegioActivo &&
-  publicacionColegioActual == -1
-) {
+    if (
+      escenario == 2 &&
+      minijuegoColegioActivo &&
+      publicacionColegioActual == -1
+    ) {
 
-  boolean l1Ahora = botonL1.pressed();
-  boolean r1Ahora = botonR1.pressed();
-  boolean l2Ahora = botonL2.pressed();
+      boolean l1Ahora = botonL1.pressed();
+      boolean r1Ahora = botonR1.pressed();
+      boolean l2Ahora = botonL2.pressed();
 
-  if (l1Ahora && !l1PresionadoAntes) {
+      if (l1Ahora && !l1PresionadoAntes) {
 
-    publicacionColegioActual = 0;
+        publicacionColegioActual = 0;
 
-    puntoAcopioActual =
-      puntoPublicacionColegio[0];
+        puntoAcopioActual =
+        puntoPublicacionColegio[0];
 
-    redSocialAbierta = false;
-  }
+        redSocialAbierta = false;
+      }
 
-  else if (r1Ahora && !r1PresionadoAntes) {
+      else if (r1Ahora && !r1PresionadoAntes) {
 
-    publicacionColegioActual = 1;
+        publicacionColegioActual = 1;
 
-    puntoAcopioActual =
-      puntoPublicacionColegio[1];
+        puntoAcopioActual =
+        puntoPublicacionColegio[1];
 
-    redSocialAbierta = false;
-  }
+        redSocialAbierta = false;
+      }
 
-  else if (l2Ahora && !l2PresionadoAntes) {
+      else if (l2Ahora && !l2PresionadoAntes) {
 
-    publicacionColegioActual = 2;
+        publicacionColegioActual = 2;
 
-    puntoAcopioActual =
-      puntoPublicacionColegio[2];
+        puntoAcopioActual =
+        puntoPublicacionColegio[2];
 
-    redSocialAbierta = false;
-  }
+        redSocialAbierta = false;
+      }
 
-  l1PresionadoAntes = l1Ahora;
-  r1PresionadoAntes = r1Ahora;
-  l2PresionadoAntes = l2Ahora;
+      l1PresionadoAntes = l1Ahora;
+      r1PresionadoAntes = r1Ahora;
+      l2PresionadoAntes = l2Ahora;
 
-  return;
-}
+      return;
+    }
 
     boolean l1Ahora = botonL1.pressed();
     boolean r1Ahora = botonR1.pressed();
@@ -641,7 +624,7 @@ void dibujarMundo() {
 
     fondoColegio();
     dibujarBusPlaza();
-     dibujarPuntosAcopioColegio();
+    dibujarPuntosAcopioColegio();
 
   } else {
 
@@ -690,7 +673,6 @@ void revisarCambioEscenario() {
     }
   }
 
-
   // COLEGIO
   else if (escenario == 2) {
 
@@ -712,7 +694,6 @@ void revisarCambioEscenario() {
       jugadorY = 520;
     }
   }
-
 
   // PLAZA -> COLEGIO
   else if (escenario == 3) {
@@ -1525,16 +1506,16 @@ void dibujarPantallaConecta() {
   // Buscar publicación para el escenario actual
   int idx = obtenerIndicePublicacion(escenario);
   // =====================================================
-// CONECTA ESPECIAL DEL MINIJUEGO DEL COLEGIO
-// =====================================================
+  // CONECTA ESPECIAL DEL MINIJUEGO DEL COLEGIO
+  // =====================================================
 
-if (escenario == 2 && minijuegoColegioActivo) {
+  if (escenario == 2 && minijuegoColegioActivo) {
 
-  dibujarConectaColegio();
+    dibujarConectaColegio();
 
-  popStyle();
-  return;
-}
+    popStyle();
+    return;
+  }
 
   if (idx != -1 && !pubProcesadas[idx]) {
     // Tarjeta de publicación
@@ -1624,8 +1605,6 @@ void keyPressed() {
     redSocialAbierta = !redSocialAbierta;
   }
 
- 
-
   // Movimiento WASD
   if (key == 'w' || key == 'W') moverArriba = true;
   if (key == 's' || key == 'S') moverAbajo = true;
@@ -1672,7 +1651,6 @@ void moverJugador() {
   float dy = 0;
   jugadorCaminando = false;
 
-
   // ==========================================
   // MOVIMIENTO CON TECLADO WASD
   // ==========================================
@@ -1682,7 +1660,6 @@ void moverJugador() {
   if (moverIzquierda) dx -= 1;
   if (moverDerecha) dx += 1;
 
-
   // ==========================================
   // MOVIMIENTO CON CONTROL PS4
   // ==========================================
@@ -1690,21 +1667,20 @@ void moverJugador() {
   if (mandoConectado) {
 
     float movimientoX = joystickX.getValue();
-float movimientoY = joystickY.getValue();
+    float movimientoY = joystickY.getValue();
 
-if (abs(movimientoX) < 0.15) {
-  movimientoX = 0;
-}
+    if (abs(movimientoX) < 0.15) {
+      movimientoX = 0;
+    }
 
-if (abs(movimientoY) < 0.15) {
-  movimientoY = 0;
-}
+    if (abs(movimientoY) < 0.15) {
+      movimientoY = 0;
+    }
 
-// JOYSTICK IZQUIERDO
-dx += movimientoX;
-dy += movimientoY;
+    // JOYSTICK IZQUIERDO
+    dx += movimientoX;
+    dy += movimientoY;
   }
-
 
   // ==========================================
   // VELOCIDAD EN DIAGONAL
@@ -1714,7 +1690,7 @@ dy += movimientoY;
     animacionCaminar += 0.25;
   }
   if (dx != 0 && dy != 0) {
-  
+
     float magnitud = sqrt(dx * dx + dy * dy);
 
     if (magnitud > 1) {
@@ -1723,14 +1699,12 @@ dy += movimientoY;
     }
   }
 
-
   // ==========================================
   // APLICAR VELOCIDAD
   // ==========================================
 
   dx *= velocidadJugador;
   dy *= velocidadJugador;
-
 
   // ==========================================
   // COLISION HORIZONTAL
@@ -1745,7 +1719,6 @@ dy += movimientoY;
   if (!colisiona(nx, jugadorY)) {
     jugadorX = nx;
   }
-
 
   // ==========================================
   // COLISION VERTICAL
@@ -1777,7 +1750,7 @@ boolean colisiona(float x, float y) {
 
 void dibujarJugador() {
   noStroke();
-    // ==========================================
+  // ==========================================
   // ANIMACIÓN DE CAMINAR
   // ==========================================
 
@@ -1787,10 +1760,10 @@ void dibujarJugador() {
   if (jugadorCaminando) {
 
     movimientoPiernas =
-      sin(animacionCaminar) * 5;
+    sin(animacionCaminar) * 5;
 
     movimientoBrazos =
-      sin(animacionCaminar) * 4;
+    sin(animacionCaminar) * 4;
   }
   fill(70, 70, 70, 120);
   ellipse(jugadorX, jugadorY + 22, 32, 10);
@@ -1866,13 +1839,12 @@ void cambiarIndicadores(
 // 26.1 ACTUALIZAR BUS
 // -------------------------
 
-  void actualizarBus() {
+void actualizarBus() {
 
   // El bus solo existe en el Barrio
   if (escenario != 1 || viajandoEnBus) {
     return;
   }
-
 
   // SI ESTÁ DETENIDO
   if (busDetenido) {
@@ -1889,7 +1861,6 @@ void cambiarIndicadores(
     // MOVER BUS
     busX += velocidadBus;
 
-
     // DETENERSE EN LA PARADA
     if (!busYaParo && busX >= paradaBusX) {
 
@@ -1901,7 +1872,6 @@ void cambiarIndicadores(
 
       tiempoBusDetenido = 0;
     }
-
 
     // SI SALE DEL MAPA, VUELVE A EMPEZAR
     if (busX > mundoW + 180) {
@@ -1927,11 +1897,9 @@ void dibujarBus() {
     return;
   }
 
-
   pushStyle();
 
   rectMode(CENTER);
-
 
   // SOMBRA
   noStroke();
@@ -1944,7 +1912,6 @@ void dibujarBus() {
     25
   );
 
-
   // CUERPO DEL BUS
   fill(245, 190, 40);
 
@@ -1956,7 +1923,6 @@ void dibujarBus() {
     14
   );
 
-
   // PARTE INFERIOR
   fill(220, 145, 20);
 
@@ -1967,14 +1933,12 @@ void dibujarBus() {
     30
   );
 
-
   // VENTANAS
   fill(120, 190, 220);
 
   rect(busX - 70, busY - 15, 42, 28, 5);
   rect(busX - 20, busY - 15, 42, 28, 5);
   rect(busX + 30, busY - 15, 42, 28, 5);
-
 
   // PUERTA
   fill(75, 125, 150);
@@ -1986,7 +1950,6 @@ void dibujarBus() {
     58,
     4
   );
-
 
   // RUEDAS
   fill(35);
@@ -2005,7 +1968,6 @@ void dibujarBus() {
     36
   );
 
-
   fill(130);
 
   ellipse(
@@ -2022,7 +1984,6 @@ void dibujarBus() {
     15
   );
 
-
   // TEXTO DEL BUS
   fill(255);
 
@@ -2034,7 +1995,6 @@ void dibujarBus() {
     busX,
     busY + 15
   );
-
 
   rectMode(CORNER);
 
@@ -2063,17 +2023,16 @@ void revisarInteraccionBus() {
     }
   }
 
-
   if (mandoConectado && cercaDelBus) {
 
     boolean xAhora = botonX.pressed();
 
     if (xAhora && !xPresionadoAntes) {
 
-  viajandoEnBus = true;
+      viajandoEnBus = true;
 
-  println("SUBIENDO AL BUS");
-}
+      println("SUBIENDO AL BUS");
+    }
 
     xPresionadoAntes = xAhora;
 
@@ -2129,13 +2088,12 @@ void actualizarViajeBus() {
 // 27.1 ACTUALIZAR BUS
 // -------------------------
 
-  void actualizarBusPlaza() {
+void actualizarBusPlaza() {
 
   // Este bus solamente existe en el Colegio
   if (escenario != 2 || viajandoAPlaza) {
     return;
   }
-
 
   if (busPlazaDetenido) {
 
@@ -2152,7 +2110,6 @@ void actualizarViajeBus() {
     // MOVER BUS
     busPlazaX += velocidadBusPlaza;
 
-
     // DETENER BUS
     if (!busPlazaYaParo && busPlazaX >= paradaBusPlazaX) {
 
@@ -2164,7 +2121,6 @@ void actualizarViajeBus() {
 
       tiempoBusPlazaDetenido = 0;
     }
-
 
     // VOLVER A COMENZAR
     if (busPlazaX > mundoW + 180) {
@@ -2190,11 +2146,9 @@ void dibujarBusPlaza() {
     return;
   }
 
-
   pushStyle();
 
   rectMode(CENTER);
-
 
   // SOMBRA
   noStroke();
@@ -2207,7 +2161,6 @@ void dibujarBusPlaza() {
     25
   );
 
-
   // CUERPO
   fill(70, 120, 210);
 
@@ -2219,7 +2172,6 @@ void dibujarBusPlaza() {
     14
   );
 
-
   // PARTE INFERIOR
   fill(40, 80, 170);
 
@@ -2230,14 +2182,12 @@ void dibujarBusPlaza() {
     30
   );
 
-
   // VENTANAS
   fill(120, 190, 220);
 
   rect(busPlazaX - 70, busPlazaY - 15, 42, 28, 5);
   rect(busPlazaX - 20, busPlazaY - 15, 42, 28, 5);
   rect(busPlazaX + 30, busPlazaY - 15, 42, 28, 5);
-
 
   // PUERTA
   fill(75, 125, 150);
@@ -2249,7 +2199,6 @@ void dibujarBusPlaza() {
     58,
     4
   );
-
 
   // RUEDAS
   fill(35);
@@ -2268,7 +2217,6 @@ void dibujarBusPlaza() {
     36
   );
 
-
   fill(130);
 
   ellipse(
@@ -2285,7 +2233,6 @@ void dibujarBusPlaza() {
     15
   );
 
-
   // DESTINO
   fill(255);
 
@@ -2297,7 +2244,6 @@ void dibujarBusPlaza() {
     busPlazaX,
     busPlazaY + 15
   );
-
 
   rectMode(CORNER);
 
@@ -2326,7 +2272,6 @@ void revisarInteraccionBusPlaza() {
       cercaBusPlaza = true;
     }
   }
-
 
   // PRESIONAR X PARA SUBIR
   if (
@@ -2366,7 +2311,6 @@ void actualizarViajePlaza() {
 
   oscuridadPlaza += 6;
 
-
   fill(
     0,
     constrain(oscuridadPlaza, 0, 255)
@@ -2380,7 +2324,6 @@ void actualizarViajePlaza() {
     width,
     height
   );
-
 
   if (oscuridadPlaza >= 255) {
 
@@ -2532,7 +2475,6 @@ void controlarDialogoBombero() {
 
   boolean cuadradoAhora = botonCuadrado.pressed();
 
-
   // SI ESTAMOS CERCA DEL BOMBERO
   if (
     escenario == 1 &&
@@ -2546,21 +2488,21 @@ void controlarDialogoBombero() {
       // Si todavía no había diálogo, abrirlo
       if (!dialogoBomberoActivo) {
 
-  dialogoBomberoActivo = true;
-  dialogoBombero = 1;
+        dialogoBomberoActivo = true;
+        dialogoBombero = 1;
 
-} else {
+      } else {
 
-  dialogoBombero++;
+        dialogoBombero++;
 
-  // Si ya pasamos el último diálogo
-  if (dialogoBombero > 3) {
+        // Si ya pasamos el último diálogo
+        if (dialogoBombero > 3) {
 
-    dialogoBomberoActivo = false;
+          dialogoBomberoActivo = false;
 
-    iniciarMinijuegoIncendios();
-  }
-}
+          iniciarMinijuegoIncendios();
+        }
+      }
     }
   }
 
@@ -2712,7 +2654,7 @@ void iniciarMinijuegoIncendios() {
 
   minijuegoIncendiosActivo = true;
   minijuegoIncendiosTerminado = false;
-resultadoCartelesAplicado = false;
+  resultadoCartelesAplicado = false;
   puntosIncendios = 100;
   incendiosApagados = 0;
 
@@ -2756,7 +2698,6 @@ void dibujarIncendios() {
     rectMode(CENTER);
     noStroke();
 
-
     // SOMBRA
     fill(0, 50);
 
@@ -2767,7 +2708,6 @@ void dibujarIncendios() {
       12
     );
 
-
     // POSTE DEL CARTEL
     fill(90, 65, 45);
 
@@ -2777,7 +2717,6 @@ void dibujarIncendios() {
       7,
       48
     );
-
 
     // CARTEL
     fill(245, 235, 210);
@@ -2793,7 +2732,6 @@ void dibujarIncendios() {
       4
     );
 
-
     // FRANJA ROJA
     noStroke();
 
@@ -2807,7 +2745,6 @@ void dibujarIncendios() {
       2
     );
 
-
     // TEXTO DEL CARTEL
     fill(255);
 
@@ -2820,7 +2757,6 @@ void dibujarIncendios() {
       y - 32
     );
 
-
     fill(40);
     textSize(8);
 
@@ -2829,7 +2765,6 @@ void dibujarIncendios() {
       x,
       y - 15
     );
-
 
     // SIGNO DE ALERTA
     fill(220, 50, 50);
@@ -2840,7 +2775,6 @@ void dibujarIncendios() {
       x + 21,
       y - 5
     );
-
 
     rectMode(CORNER);
 
@@ -2976,11 +2910,10 @@ void actualizarMinijuegoIncendios() {
   }
 
   int segundosPasados =
-    (millis() - tiempoInicioIncendios) / 1000;
+  (millis() - tiempoInicioIncendios) / 1000;
 
   int tiempoRestante =
-    duracionMinijuego - segundosPasados;
-
+  duracionMinijuego - segundosPasados;
 
   // RESTAR 1 PUNTO CADA SEGUNDO
   if (segundosPasados > ultimoSegundoDescontado) {
@@ -2994,7 +2927,6 @@ void actualizarMinijuegoIncendios() {
     }
   }
 
-
   // SE ACABÓ EL TIEMPO
   if (tiempoRestante <= 0) {
 
@@ -3003,7 +2935,6 @@ void actualizarMinijuegoIncendios() {
 
     println("TIEMPO AGOTADO");
   }
-
 
   // APAGÓ TODOS
   if (incendiosApagados >= incendios.length) {
@@ -3016,12 +2947,12 @@ void actualizarMinijuegoIncendios() {
   }
   if (tiempoRestante <= 0) {
 
-  minijuegoIncendiosActivo = false;
-  minijuegoIncendiosTerminado = true;
-   aplicarResultadoCarteles();
+    minijuegoIncendiosActivo = false;
+    minijuegoIncendiosTerminado = true;
+    aplicarResultadoCarteles();
 
-  println("TIEMPO AGOTADO");
-}
+    println("TIEMPO AGOTADO");
+  }
 }
 
 // -------------------------
@@ -3037,8 +2968,7 @@ void aplicarResultadoCarteles() {
   resultadoCartelesAplicado = true;
 
   float porcentaje =
-    (float) incendiosApagados / incendios.length;
-
+  (float) incendiosApagados / incendios.length;
 
   // =====================================================
   // EXCELENTE - RETIRÓ 80% O MÁS
@@ -3061,10 +2991,9 @@ void aplicarResultadoCarteles() {
     println("Participacion +10");
     println("Reputacion +15");
 
-
-  // =====================================================
-  // REGULAR - RETIRÓ ENTRE 50% Y 79%
-  // =====================================================
+    // =====================================================
+    // REGULAR - RETIRÓ ENTRE 50% Y 79%
+    // =====================================================
 
   } else if (porcentaje >= 0.50) {
 
@@ -3082,10 +3011,9 @@ void aplicarResultadoCarteles() {
     println("Participacion +5");
     println("Reputacion +5");
 
-
-  // =====================================================
-  // MALO - RETIRÓ MENOS DEL 50%
-  // =====================================================
+    // =====================================================
+    // MALO - RETIRÓ MENOS DEL 50%
+    // =====================================================
 
   } else {
 
@@ -3117,14 +3045,13 @@ void dibujarHUDIncendios() {
   }
 
   int segundosPasados =
-    (millis() - tiempoInicioIncendios) / 1000;
+  (millis() - tiempoInicioIncendios) / 1000;
 
   int tiempoRestante =
-    duracionMinijuego - segundosPasados;
+  duracionMinijuego - segundosPasados;
 
   tiempoRestante =
-    max(tiempoRestante, 0);
-
+  max(tiempoRestante, 0);
 
   pushStyle();
 
@@ -3139,7 +3066,6 @@ void dibujarHUDIncendios() {
     85,
     12
   );
-
 
   fill(255);
 
@@ -3156,14 +3082,12 @@ void dibujarHUDIncendios() {
     28
   );
 
-
   text(
     "PUNTOS: " +
     puntosIncendios,
     width - 280,
     52
   );
-
 
   text(
     "TIEMPO: " +
@@ -3239,14 +3163,14 @@ void dibujarPuntosAcopioColegio() {
   popStyle();
 }
 void dibujarConectaColegio() {
-if (
-  publicacionColegioActual != -1 &&
-  publicacionVerificadaColegio[publicacionColegioActual]
-) {
+  if (
+    publicacionColegioActual != -1 &&
+    publicacionVerificadaColegio[publicacionColegioActual]
+  ) {
 
-  dibujarResultadoInvestigacionColegio();
-  return;
-}
+    dibujarResultadoInvestigacionColegio();
+    return;
+  }
   fill(255);
   textAlign(CENTER, CENTER);
 
@@ -3266,119 +3190,118 @@ if (
     120
   );
 
-
   // =====================================================
   // PUBLICACIÓN 1
   // =====================================================
-if (!crisisColegioResuelta[0]){
-  
-  fill(35, 42, 55);
-  stroke(80);
-  strokeWeight(2);
+  if (!crisisColegioResuelta[0]){
 
-  rect(
-    width/2 - 170,
-    155,
-    340,
-    110,
-    10
-  );
+    fill(35, 42, 55);
+    stroke(80);
+    strokeWeight(2);
 
-  fill(255);
-  textAlign(LEFT, TOP);
-  textSize(13);
+    rect(
+      width/2 - 170,
+      155,
+      340,
+      110,
+      10
+    );
 
-  text(
-    publicacionesColegio[0],
-    width/2 - 150,
-    170,
-    300,
-    50
-  );
+    fill(255);
+    textAlign(LEFT, TOP);
+    textSize(13);
 
-  fill(255, 100, 100);
-  textSize(12);
+    text(
+      publicacionesColegio[0],
+      width/2 - 150,
+      170,
+      300,
+      50
+    );
 
-  text(
-    "Viralidad: " + round(viralidadColegio[0]) + "%",
-    width/2 - 150,
-    230
-  );
+    fill(255, 100, 100);
+    textSize(12);
 
-}
+    text(
+      "Viralidad: " + round(viralidadColegio[0]) + "%",
+      width/2 - 150,
+      230
+    );
+
+  }
   // =====================================================
   // PUBLICACIÓN 2
   // =====================================================
-if (!crisisColegioResuelta[1]) {
-  fill(35, 42, 55);
-  stroke(80);
+  if (!crisisColegioResuelta[1]) {
+    fill(35, 42, 55);
+    stroke(80);
 
-  rect(
-    width/2 - 170,
-    285,
-    340,
-    110,
-    10
-  );
+    rect(
+      width/2 - 170,
+      285,
+      340,
+      110,
+      10
+    );
 
-  fill(255);
-  textAlign(LEFT, TOP);
-  textSize(13);
+    fill(255);
+    textAlign(LEFT, TOP);
+    textSize(13);
 
-  text(
-    publicacionesColegio[1],
-    width/2 - 150,
-    300,
-    300,
-    50
-  );
+    text(
+      publicacionesColegio[1],
+      width/2 - 150,
+      300,
+      300,
+      50
+    );
 
-  fill(255, 100, 100);
-  textSize(12);
+    fill(255, 100, 100);
+    textSize(12);
 
-  text(
-    "Viralidad: " + round(viralidadColegio[1]) + "%",
-    width/2 - 150,
-    360
-  );
+    text(
+      "Viralidad: " + round(viralidadColegio[1]) + "%",
+      width/2 - 150,
+      360
+    );
 
-}
+  }
   // =====================================================
   // PUBLICACIÓN 3
   // =====================================================
-if (!crisisColegioResuelta[2]) {
-  fill(35, 42, 55);
-  stroke(80);
+  if (!crisisColegioResuelta[2]) {
+    fill(35, 42, 55);
+    stroke(80);
 
-  rect(
-    width/2 - 170,
-    415,
-    340,
-    110,
-    10
-  );
+    rect(
+      width/2 - 170,
+      415,
+      340,
+      110,
+      10
+    );
 
-  fill(255);
-  textAlign(LEFT, TOP);
-  textSize(13);
+    fill(255);
+    textAlign(LEFT, TOP);
+    textSize(13);
 
-  text(
-    publicacionesColegio[2],
-    width/2 - 150,
-    430,
-    300,
-    50
-  );
+    text(
+      publicacionesColegio[2],
+      width/2 - 150,
+      430,
+      300,
+      50
+    );
 
-  fill(255, 100, 100);
-  textSize(12);
+    fill(255, 100, 100);
+    textSize(12);
 
-  text(
-    "Viralidad: " + round(viralidadColegio[2]) + "%",
-    width/2 - 150,
-    490
-  );
-}
+    text(
+      "Viralidad: " + round(viralidadColegio[2]) + "%",
+      width/2 - 150,
+      490
+    );
+  }
 
   // =====================================================
   // CONTROLES
@@ -3532,24 +3455,23 @@ void dibujarResultadoInvestigacionColegio() {
 
   } else if (publicacionColegioActual == 1) {
 
-  text(
-    "La encuesta solo se realizó a un grupo pequeño\n" +
-    "de estudiantes y no representa a todo el colegio.\n" +
-    "El porcentaje publicado exagera el resultado.",
-    width/2,
-    155
-  );
-} else if (publicacionColegioActual == 2) {
+    text(
+      "La encuesta solo se realizó a un grupo pequeño\n" +
+      "de estudiantes y no representa a todo el colegio.\n" +
+      "El porcentaje publicado exagera el resultado.",
+      width/2,
+      155
+    );
+  } else if (publicacionColegioActual == 2) {
 
-  text(
-    "El foro electoral continúa con normalidad.\n" +
-    "No hubo disturbios ni fue suspendido.\n" +
-    "La publicación difundió un rumor falso.",
-    width/2,
-    155
-  );
-}
-
+    text(
+      "El foro electoral continúa con normalidad.\n" +
+      "No hubo disturbios ni fue suspendido.\n" +
+      "La publicación difundió un rumor falso.",
+      width/2,
+      155
+    );
+  }
 
   // =====================================================
   // OPCIONES
@@ -3639,7 +3561,6 @@ void procesarDecisionColegio(int opcion) {
     );
   }
 
-
   // =====================================================
   // MARCAR ESTA CRISIS COMO RESUELTA
   // =====================================================
@@ -3647,7 +3568,6 @@ void procesarDecisionColegio(int opcion) {
   crisisColegioResuelta[i] = true;
 
   crisisColegioCompletadas++;
-
 
   // Ya no hay una publicación seleccionada
   publicacionColegioActual = -1;
@@ -3657,7 +3577,6 @@ void procesarDecisionColegio(int opcion) {
 
   // Cerrar Conecta
   redSocialAbierta = false;
-
 
   println(
     "CRISIS DEL COLEGIO RESUELTA: " + i

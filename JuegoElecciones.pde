@@ -100,6 +100,11 @@ boolean[] pubProcesadas = {
 };
 
 boolean redSocialAbierta = false;
+boolean mostrarTipConecta = false;
+String tituloTipConecta = "";
+String mensajeTipConecta = "";
+color colorTipConecta = color(108, 92, 231);
+int tiempoTipConecta = 0;
 // =====================================================
 // MINIJUEGO 2 - COLEGIO / CRISIS ELECTORAL EN CONECTA
 // =====================================================
@@ -214,26 +219,6 @@ int[] puntoPublicacionColegio = {
 boolean minijuegoPlazaActivo = false;
 boolean minijuegoPlazaTerminado = false;
 
-// Comentarios sobre el debate ciudadano
-String[] comentariosPlaza = {
-  "El debate comenzó puntual y todas las candidaturas presentaron sus propuestas.",
-  "URGENTE: un candidato abandonó el debate después de ser descubierto mintiendo.",
-  "La propuesta de movilidad fue respaldada por organizaciones vecinales.",
-  "BOT_NOVA: comparte este mensaje y recibirás un premio por apoyar al candidato.",
-  "La periodista Laura confirmó que el foro continuará abierto a preguntas del público.",
-  "Miles de personas aseguran que el resultado ya fue decidido, pero nadie presenta pruebas."
-};
-
-// Indica si cada comentario fue publicado por un bot
-boolean[] respuestaCorrectaPlaza = {
-  false,
-  true,
-  false,
-  true,
-  false,
-  true
-};
-
 // Periodista Laura
 float npcLauraX = 880;
 float npcLauraY = 300;
@@ -243,11 +228,48 @@ int dialogoLaura = 0;
 boolean cuadradoLauraAntes = false;
 boolean l1PlazaAntes = false;
 boolean r1PlazaAntes = false;
+boolean xPlazaAntes = false;
+boolean mousePlazaAntes = false;
 
 // Progreso del minijuego
 int aciertosPlaza = 0;
 int desaciertosPlaza = 0;
-int comentarioActualPlaza = -1;
+float reticulaX = 0;
+float reticulaY = 0;
+int perfilSeleccionadoPlaza = -1;
+int perfilesResueltosPlaza = 0;
+int botsDesmanteladosPlaza = 0;
+boolean tarjetaMetadatosPlaza = false;
+float[] perfilesXPlaza = {210, 430, 680, 900, 1080};
+float[] perfilesYPlaza = {245, 390, 235, 410, 290};
+String[] perfilesSospechososPlaza = {
+  "@voz_vecinal",
+  "@alerta_nova",
+  "@cambio_real",
+  "@bot_nova_500",
+  "@foro_abierto"
+};
+boolean[] perfilesBotPlaza = {
+  false,
+  true,
+  false,
+  true,
+  true
+};
+String[] metadatosPerfilesPlaza = {
+  "Antigüedad: 4 años | Patrón: conversaciones variadas",
+  "Antigüedad: 1 hora | Patrón: 500 mensajes idénticos",
+  "Antigüedad: 2 años | Patrón: responde con experiencias propias",
+  "Antigüedad: 3 minutos | Patrón: publica cada 10 segundos",
+  "Antigüedad: 8 minutos | Patrón: repite etiquetas coordinadas"
+};
+boolean[] perfilesRevisadosPlaza = {
+  false,
+  false,
+  false,
+  false,
+  false
+};
 
 // =====================================================
 // 6. JUGADOR - VARIABLES
@@ -473,6 +495,7 @@ void draw() {
   // 2. MOVER JUGADOR
   if (
     !redSocialAbierta &&
+    !minijuegoPlazaActivo &&
     !viajandoEnBus &&
     !viajandoAPlaza
   ) {
@@ -494,6 +517,7 @@ void draw() {
 
   // 6. INTERFAZ DE RED SOCIAL
   gestionarRedSocialGUI();
+  dibujarTipConecta();
   mostrarMensajeNpcBombero();
   mostrarMensajeIncendio();
   dibujarHUDIncendios();
@@ -1509,22 +1533,94 @@ void gestionarRedSocialGUI() {
   }
 }
 
+void activarTipConecta(int opcion) {
+  if (opcion == 1) {
+    tituloTipConecta = "Compartir sin verificar";
+    mensajeTipConecta = "¡Cuidado! Compartir sin verificar aumenta la desinformación en Nova.";
+    colorTipConecta = color(232, 111, 105);
+  } else if (opcion == 2) {
+    tituloTipConecta = "Verificación responsable";
+    mensajeTipConecta = "¡Excelente Ciudadanía Digital! Verificar fuentes protege a la comunidad.";
+    colorTipConecta = color(87, 176, 116);
+  } else if (opcion == 3) {
+    tituloTipConecta = "Decisión en Conecta";
+    mensajeTipConecta = "Actitud Pasiva: Ignorar evita desinformar, pero reportar protege a más vecinos.";
+    colorTipConecta = color(108, 92, 231);
+  } else {
+    return;
+  }
+
+  mostrarTipConecta = true;
+  tiempoTipConecta = millis();
+}
+
+void dibujarTipConecta() {
+  if (!mostrarTipConecta) {
+    return;
+  }
+
+  if (millis() - tiempoTipConecta >= 4000) {
+    mostrarTipConecta = false;
+    return;
+  }
+
+  pushStyle();
+  rectMode(CORNER);
+
+  float tarjetaX = width/2 - 250;
+  float tarjetaY = 18;
+  float tarjetaAncho = 500;
+  float tarjetaAlto = 86;
+
+  noStroke();
+  fill(45, 52, 54, 45);
+  rect(tarjetaX + 3, tarjetaY + 4, tarjetaAncho, tarjetaAlto, 16);
+
+  fill(248, 246, 240);
+  stroke(colorTipConecta);
+  strokeWeight(3);
+  rect(tarjetaX, tarjetaY, tarjetaAncho, tarjetaAlto, 16);
+
+  fill(colorTipConecta);
+  noStroke();
+  rect(tarjetaX, tarjetaY, 8, tarjetaAlto, 16, 0, 0, 16);
+
+  fill(45, 52, 54);
+  textAlign(LEFT, TOP);
+  textSize(14);
+  text(tituloTipConecta, tarjetaX + 24, tarjetaY + 14);
+
+  fill(90, 86, 92);
+  textSize(12);
+  textLeading(16);
+  text(mensajeTipConecta, tarjetaX + 24, tarjetaY + 37, tarjetaAncho - 44, 38);
+
+  popStyle();
+}
+
 void dibujarIconoRedSocial() {
   pushStyle();
   rectMode(CORNER);
-  stroke(255);
-  strokeWeight(2);
-  fill(30, 144, 255); // Azul Conecta
-  rect(width - 65, 15, 50, 50, 12);
+  fill(45, 52, 54, 45);
+  noStroke();
+  rect(width - 63, 18, 50, 50, 14);
 
+  fill(108, 92, 231);
+  rect(width - 65, 15, 50, 50, 14);
+
+  stroke(255, 210);
+  strokeWeight(2);
+  noFill();
+  rect(width - 51, 24, 22, 32, 5);
+  noStroke();
   fill(255);
-  textAlign(CENTER, CENTER);
-  textSize(22);
-  text("📱", width - 40, 38);
+  ellipse(width - 40, 51, 4, 4);
+  fill(248, 246, 240);
+  ellipse(width - 40, 29, 4, 4);
 
   // Notificación roja si hay publicación pendiente en este escenario
   if (hayPublicacionesPendientes(escenario)) {
-    fill(255, 50, 50);
+    fill(238, 105, 113);
     noStroke();
     ellipse(width - 15, 15, 14, 14);
   }
@@ -1534,23 +1630,40 @@ void dibujarIconoRedSocial() {
 void dibujarPantallaConecta() {
   pushStyle();
 
-  fill(0, 0, 0, 180);
+  rectMode(CORNER);
+  fill(45, 52, 54, 90);
+  noStroke();
   rect(0, 0, width, height);
 
   // Marco del teléfono
-  fill(20, 25, 35);
-  stroke(30, 144, 255);
+  fill(45, 52, 54, 55);
+  noStroke();
+  rect(width/2 - 194, 25, 400, height - 40, 24);
+
+  fill(45, 52, 54);
+  stroke(45, 52, 54);
   strokeWeight(3);
   rect(width/2 - 200, 20, 400, height - 40, 20);
 
+  fill(248, 246, 240);
+  noStroke();
+  rect(width/2 - 192, 28, 384, height - 56, 15);
+
   // Encabezado
-  fill(30, 144, 255);
-  rect(width/2 - 200, 20, 400, 45, 20, 20, 0, 0);
+  fill(108, 92, 231);
+  rect(width/2 - 192, 28, 384, 48, 15, 15, 0, 0);
+
+  // Muesca superior y cámara
+  fill(45, 52, 54);
+  rect(width/2 - 52, 25, 104, 20, 10);
+  fill(108, 92, 231);
+  ellipse(width/2 + 28, 35, 7, 7);
+
   fill(255);
   textAlign(CENTER, CENTER);
-  textSize(16);
+  textSize(15);
   String nombreEscenario = (escenario == 1) ? "BARRIO" : (escenario == 2) ? "COLEGIO" : "ELECCIÓN";
-  text("RED CONECTA - " + nombreEscenario, width/2, 42);
+  text("RED CONECTA - " + nombreEscenario, width/2, 58);
 
   // Buscar publicación para el escenario actual
   int idx = obtenerIndicePublicacion(escenario);
@@ -1567,18 +1680,34 @@ void dibujarPantallaConecta() {
   }
 
   if (idx != -1 && !pubProcesadas[idx]) {
-    // Tarjeta de publicación
-    fill(35, 42, 55);
-    stroke(60, 70, 90);
-    rect(width/2 - 180, 80, 360, 140, 10);
+    // Tarjeta de publicación con sombra tenue
+    fill(45, 52, 54, 35);
+    noStroke();
+    rect(width/2 - 176, 84, 360, 140, 14);
+    fill(255);
+    stroke(228, 225, 220);
+    strokeWeight(1);
+    rect(width/2 - 180, 80, 360, 140, 14);
 
-    fill(180, 200, 220);
+    // Avatar circular simulado
+    fill(108, 92, 231);
+    noStroke();
+    ellipse(width/2 - 153, 103, 30, 30);
+    fill(255);
+    textAlign(CENTER, CENTER);
+    textSize(14);
+    String inicialAutor = pubAutores[idx].substring(1, 2).toUpperCase();
+    text(inicialAutor, width/2 - 153, 103);
+
+    fill(45, 52, 54);
     textAlign(LEFT, TOP);
     textSize(12);
-    text("Autor: " + pubAutores[idx], width/2 - 165, 92);
-    text("Confiabilidad: " + pubConfiabilidad[idx] + "%  |  Viralidad: " + pubViralidad[idx] + "%", width/2 - 165, 110);
+    text(pubAutores[idx], width/2 - 132, 92);
+    fill(112, 106, 115);
+    textSize(10);
+    text("Confiabilidad: " + pubConfiabilidad[idx] + "%  |  Viralidad: " + pubViralidad[idx] + "%", width/2 - 132, 108);
 
-    fill(255);
+    fill(45, 52, 54);
     textSize(13);
     textLeading(18);
     text(pubTitulos[idx], width/2 - 165, 135, 330, 80);
@@ -1588,14 +1717,14 @@ void dibujarPantallaConecta() {
     dibujarBotonOpcion(width/2 - 170, 280, "R1. Verificar / Reportar", color(80, 180, 100));
     dibujarBotonOpcion(width/2 - 170, 325, "L2. Ignorar Publicación", color(120, 130, 140));
   } else {
-    fill(200);
+    fill(112, 106, 115);
     textAlign(CENTER, CENTER);
     textSize(14);
     text("No hay publicaciones pendientes\nen esta zona de la ciudad.", width/2, height/2 - 10);
   }
 
   // Indicación de cierre
-  fill(150);
+  fill(112, 106, 115);
   textSize(11);
   textAlign(CENTER);
   text("[ Presiona C, Cuadrado o Clic en el icono para Cerrar ]", width/2, height - 30);
@@ -1604,13 +1733,19 @@ void dibujarPantallaConecta() {
 }
 
 void dibujarBotonOpcion(float x, float y, String texto, int c) {
-  fill(c);
+  fill(45, 52, 54, 35);
   noStroke();
-  rect(x, y, 340, 36, 8);
+  rect(x + 2, y + 3, 340, 36, 12);
+
+  fill(c);
+  stroke(255, 150);
+  strokeWeight(1);
+  rect(x, y, 340, 36, 12);
+
   fill(255);
   textAlign(LEFT, CENTER);
   textSize(13);
-  text(texto, x + 15, y + 18);
+  text(texto, x + 18, y + 18);
 }
 
 void procesarDecision(int idx, int opcion) {
@@ -1620,11 +1755,14 @@ void procesarDecision(int idx, int opcion) {
   if (opcion == 1) {
     pubViralidad[idx] += 20;
     cambiarIndicadores(-10, -5, -5, +5, -10);
+    activarTipConecta(opcion);
   } else if (opcion == 2) {
     pubViralidad[idx] -= 15;
     cambiarIndicadores(+15, +10, +5, +10, +10);
+    activarTipConecta(opcion);
   } else if (opcion == 3) {
     cambiarIndicadores(0, 0, +5, 0, 0);
+    activarTipConecta(opcion);
   }
 
   pubProcesadas[idx] = true;
@@ -3591,6 +3729,7 @@ void procesarDecisionColegio(int opcion) {
       +5,   // Participación
       -10   // Reputación
     );
+    activarTipConecta(opcion);
   }
 
   // =====================================================
@@ -3607,6 +3746,7 @@ void procesarDecisionColegio(int opcion) {
       +10,
       +10
     );
+    activarTipConecta(opcion);
   }
 
   // =====================================================
@@ -3621,6 +3761,7 @@ void procesarDecisionColegio(int opcion) {
       0,
       -5
     );
+    activarTipConecta(opcion);
   }
 
   // =====================================================
@@ -3652,11 +3793,22 @@ void procesarDecisionColegio(int opcion) {
 void iniciarMinijuegoPlaza() {
   aciertosPlaza = 0;
   desaciertosPlaza = 0;
-  comentarioActualPlaza = 0;
   minijuegoPlazaActivo = true;
   minijuegoPlazaTerminado = false;
   l1PlazaAntes = false;
   r1PlazaAntes = false;
+  xPlazaAntes = false;
+  mousePlazaAntes = false;
+  perfilSeleccionadoPlaza = -1;
+  perfilesResueltosPlaza = 0;
+  botsDesmanteladosPlaza = 0;
+  tarjetaMetadatosPlaza = false;
+  reticulaX = width / 2;
+  reticulaY = height / 2;
+
+  for (int i = 0; i < perfilesRevisadosPlaza.length; i++) {
+    perfilesRevisadosPlaza[i] = false;
+  }
 }
 
 void revisarInteraccionNpcLaura() {
@@ -3763,13 +3915,13 @@ void dibujarDialogoLaura() {
     );
   } else if (dialogoLaura == 2) {
     text(
-      "Analiza cada comentario y decide si viene de un ciudadano real.",
+      "Rastrea los perfiles, inspecciona sus metadatos y detecta patrones.",
       100,
       300
     );
   } else if (dialogoLaura == 3) {
     text(
-      "Usa L1 para Ciudadano Real y R1 para Bot / Desinformación.",
+      "Presiona X para escanear; usa R1 para desmantelar bots o L1 para confirmar ciudadanos.",
       100,
       300
     );
@@ -3787,43 +3939,106 @@ void actualizarMinijuegoPlaza() {
   if (!minijuegoPlazaActivo) {
     l1PlazaAntes = false;
     r1PlazaAntes = false;
+    xPlazaAntes = false;
+    mousePlazaAntes = false;
     return;
   }
 
-  if (!mandoConectado) {
-    return;
+  float velocidadReticula = 4;
+  if (moverArriba) reticulaY -= velocidadReticula;
+  if (moverAbajo) reticulaY += velocidadReticula;
+  if (moverIzquierda) reticulaX -= velocidadReticula;
+  if (moverDerecha) reticulaX += velocidadReticula;
+
+  if (mandoConectado) {
+    reticulaX += joystickX.getValue() * 6;
+    reticulaY += joystickY.getValue() * 6;
   }
 
-  boolean l1Ahora = botonL1.pressed();
-  boolean r1Ahora = botonR1.pressed();
+  if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
+    reticulaX = lerp(reticulaX, mouseX, 0.18);
+    reticulaY = lerp(reticulaY, mouseY, 0.18);
+  }
 
-  if (l1Ahora && !l1PlazaAntes) {
-    evaluarComentarioPlaza(false);
-  } else if (r1Ahora && !r1PlazaAntes) {
-    evaluarComentarioPlaza(true);
+  reticulaX = constrain(reticulaX, 145, width - 145);
+  reticulaY = constrain(reticulaY, 180, height - 90);
+
+  boolean xAhora = mandoConectado && botonX.pressed();
+  boolean l1Ahora = mandoConectado && botonL1.pressed();
+  boolean r1Ahora = mandoConectado && botonR1.pressed();
+  boolean clicAhora = mousePressed;
+
+  if (clicAhora) {
+    reticulaX = mouseX;
+    reticulaY = mouseY;
+  }
+
+  if ((xAhora && !xPlazaAntes) || (clicAhora && !mousePlazaAntes)) {
+    if (!tarjetaMetadatosPlaza) {
+      perfilSeleccionadoPlaza = obtenerPerfilBajoReticula();
+      tarjetaMetadatosPlaza = perfilSeleccionadoPlaza != -1;
+    } else {
+      tarjetaMetadatosPlaza = false;
+    }
+  }
+
+  if (tarjetaMetadatosPlaza && perfilSeleccionadoPlaza != -1) {
+    if (r1Ahora && !r1PlazaAntes) {
+      resolverPerfilPlaza(true);
+    } else if (l1Ahora && !l1PlazaAntes) {
+      resolverPerfilPlaza(false);
+    }
   }
 
   l1PlazaAntes = l1Ahora;
   r1PlazaAntes = r1Ahora;
+  xPlazaAntes = xAhora;
+  mousePlazaAntes = clicAhora;
 }
 
-void evaluarComentarioPlaza(boolean respuestaBot) {
-  if (
-    comentarioActualPlaza < 0 ||
-    comentarioActualPlaza >= comentariosPlaza.length
-  ) {
+int obtenerPerfilBajoReticula() {
+  int perfilCercano = -1;
+  float distanciaCercana = 55;
+
+  for (int i = 0; i < perfilesSospechososPlaza.length; i++) {
+    if (perfilesRevisadosPlaza[i]) {
+      continue;
+    }
+
+    float perfilX = perfilesXPlaza[i] + sin(frameCount * 0.018 + i) * 18;
+    float perfilY = perfilesYPlaza[i] + cos(frameCount * 0.015 + i) * 12;
+    float distancia = dist(reticulaX, reticulaY, perfilX, perfilY);
+
+    if (distancia < distanciaCercana) {
+      distanciaCercana = distancia;
+      perfilCercano = i;
+    }
+  }
+
+  return perfilCercano;
+}
+
+void resolverPerfilPlaza(boolean desmantelarBot) {
+  if (perfilSeleccionadoPlaza == -1) {
     return;
   }
 
-  if (respuestaBot == respuestaCorrectaPlaza[comentarioActualPlaza]) {
+  boolean respuestaCorrecta = desmantelarBot == perfilesBotPlaza[perfilSeleccionadoPlaza];
+  if (respuestaCorrecta) {
     aciertosPlaza++;
+    if (desmantelarBot) {
+      botsDesmanteladosPlaza++;
+    }
   } else {
     desaciertosPlaza++;
   }
 
-  comentarioActualPlaza++;
+  perfilesRevisadosPlaza[perfilSeleccionadoPlaza] = true;
+  perfilesResueltosPlaza++;
+  tarjetaMetadatosPlaza = false;
+  perfilSeleccionadoPlaza = -1;
 
-  if (comentarioActualPlaza >= comentariosPlaza.length) {
+  if (perfilesResueltosPlaza >= perfilesSospechososPlaza.length) {
     minijuegoPlazaActivo = false;
     minijuegoPlazaTerminado = true;
     aplicarResultadoPlaza();
@@ -3831,11 +4046,7 @@ void evaluarComentarioPlaza(boolean respuestaBot) {
 }
 
 void dibujarMinijuegoPlaza() {
-  if (
-    !minijuegoPlazaActivo ||
-    comentarioActualPlaza < 0 ||
-    comentarioActualPlaza >= comentariosPlaza.length
-  ) {
+  if (!minijuegoPlazaActivo) {
     return;
   }
 
@@ -3851,65 +4062,93 @@ void dibujarMinijuegoPlaza() {
     14
   );
 
-  fill(255);
+  fill(248, 246, 240);
   textAlign(CENTER, TOP);
   textSize(22);
   text(
-    "DEBATE CIUDADANO - PLAZA NOVA",
+    "ESCÁNER DE BOTS - PLAZA NOVA",
     width / 2,
     145
   );
 
-  fill(220);
+  fill(190);
   textSize(13);
   text(
-    "Comentario " +
-    (comentarioActualPlaza + 1) +
-    " de " +
-    comentariosPlaza.length,
+    "Rastrea perfiles sospechosos y verifica su identidad digital",
     width / 2,
     180
   );
 
-  fill(255);
-  textSize(20);
-  text(
-    comentariosPlaza[comentarioActualPlaza],
-    170,
-    225,
-    width - 340,
-    100
-  );
+  for (int i = 0; i < perfilesSospechososPlaza.length; i++) {
+    if (perfilesRevisadosPlaza[i]) {
+      continue;
+    }
 
-  fill(80, 160, 220);
-  rect(
-    width / 2 - 260,
-    400,
-    220,
-    55,
-    10
-  );
+    float perfilX = perfilesXPlaza[i] + sin(frameCount * 0.018 + i) * 18;
+    float perfilY = perfilesYPlaza[i] + cos(frameCount * 0.015 + i) * 12;
 
-  fill(220, 90, 90);
-  rect(
-    width / 2 + 40,
-    400,
-    220,
-    55,
-    10
-  );
+    fill(108, 92, 231, 90);
+    ellipse(perfilX, perfilY, 56, 56);
+    fill(248, 246, 240);
+    ellipse(perfilX, perfilY, 42, 42);
+    fill(45, 52, 54);
+    textAlign(CENTER, CENTER);
+    textSize(12);
+    text(perfilesSospechososPlaza[i].substring(1, 2).toUpperCase(), perfilX, perfilY);
+    textSize(10);
+    text(perfilesSospechososPlaza[i], perfilX, perfilY + 40);
+  }
 
-  fill(255);
-  textAlign(CENTER, CENTER);
-  textSize(16);
-  text("L1  Ciudadano Real", width / 2 - 150, 428);
-  text("R1  Bot / Desinformación", width / 2 + 150, 428);
+  stroke(108, 220, 231);
+  strokeWeight(2);
+  noFill();
+  ellipse(reticulaX, reticulaY, 64, 64);
+  line(reticulaX - 42, reticulaY, reticulaX - 22, reticulaY);
+  line(reticulaX + 22, reticulaY, reticulaX + 42, reticulaY);
+  line(reticulaX, reticulaY - 42, reticulaX, reticulaY - 22);
+  line(reticulaX, reticulaY + 22, reticulaX, reticulaY + 42);
+
+  noStroke();
+  fill(220);
+  textAlign(LEFT, BOTTOM);
+  textSize(12);
+  text("X / Clic: escanear   |   R1: desmantelar bot   |   L1: confirmar ciudadano", 150, 515);
+  text("Bots desmantelados: " + botsDesmanteladosPlaza + "   Perfiles analizados: " + perfilesResueltosPlaza + "/5", 150, 535);
+
+  if (tarjetaMetadatosPlaza && perfilSeleccionadoPlaza != -1) {
+    dibujarTarjetaMetadatosPlaza();
+  }
 
   popStyle();
 }
 
+void dibujarTarjetaMetadatosPlaza() {
+  float tarjetaX = width / 2 - 220;
+  float tarjetaY = 205;
+
+  fill(45, 52, 54, 235);
+  stroke(108, 220, 231);
+  strokeWeight(2);
+  rect(tarjetaX, tarjetaY, 440, 150, 14);
+
+  fill(108, 220, 231);
+  textAlign(LEFT, TOP);
+  textSize(18);
+  text("PERFIL ESCANEADO", tarjetaX + 22, tarjetaY + 18);
+
+  fill(248, 246, 240);
+  textSize(15);
+  text(perfilesSospechososPlaza[perfilSeleccionadoPlaza], tarjetaX + 22, tarjetaY + 50);
+  fill(210);
+  textSize(13);
+  text(metadatosPerfilesPlaza[perfilSeleccionadoPlaza], tarjetaX + 22, tarjetaY + 78, 396, 40);
+  fill(255);
+  textSize(12);
+  text("R1  Desmantelar Bot       L1  Confirmar Ciudadano Real", tarjetaX + 22, tarjetaY + 124);
+}
+
 void aplicarResultadoPlaza() {
-  if (aciertosPlaza >= 5) {
+  if (botsDesmanteladosPlaza >= 3) {
     cambiarIndicadores(
       +15,
       +10,
@@ -3918,7 +4157,7 @@ void aplicarResultadoPlaza() {
       +15
     );
     println("RESULTADO PLAZA: EXCELENTE");
-  } else if (aciertosPlaza >= 3) {
+  } else if (botsDesmanteladosPlaza >= 2) {
     cambiarIndicadores(
       +5,
       +5,
@@ -3935,7 +4174,7 @@ void aplicarResultadoPlaza() {
       -10,
       -15
     );
-    println("RESULTADO PLAZA: MALO");
+    println("RESULTADO PLAZA: MALO - Bots desmantelados: " + botsDesmanteladosPlaza);
   }
 }
 

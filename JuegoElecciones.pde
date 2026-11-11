@@ -99,6 +99,8 @@ boolean[] pubProcesadas = {
   false
 };
 
+PFont fuenteConecta;
+
 boolean redSocialAbierta = false;
 boolean mostrarTipConecta = false;
 String tituloTipConecta = "";
@@ -415,6 +417,7 @@ float oscuridadPlaza = 0;
 
 void setup() {
   size(1500, 900);
+  fuenteConecta = createFont("SansSerif.bold", 14);
 
   cargarEscenario(1);
 
@@ -1565,6 +1568,7 @@ void dibujarTipConecta() {
   }
 
   pushStyle();
+  textFont(fuenteConecta);
   rectMode(CORNER);
 
   float tarjetaX = width/2 - 250;
@@ -1601,11 +1605,11 @@ void dibujarTipConecta() {
 void dibujarIconoRedSocial() {
   pushStyle();
   rectMode(CORNER);
-  fill(45, 52, 54, 45);
+  fill(60, 50, 40, 45);
   noStroke();
   rect(width - 63, 18, 50, 50, 14);
 
-  fill(108, 92, 231);
+  fill(40, 60, 140);
   rect(width - 65, 15, 50, 50, 14);
 
   stroke(255, 210);
@@ -1629,6 +1633,10 @@ void dibujarIconoRedSocial() {
 
 void dibujarPantallaConecta() {
   pushStyle();
+  textFont(fuenteConecta);
+
+  float altoTelefono = 560;
+  float telefonoY = height/2 - altoTelefono/2;
 
   rectMode(CORNER);
   fill(45, 52, 54, 90);
@@ -1636,34 +1644,34 @@ void dibujarPantallaConecta() {
   rect(0, 0, width, height);
 
   // Marco del teléfono
-  fill(45, 52, 54, 55);
+  fill(60, 50, 40, 55);
   noStroke();
-  rect(width/2 - 194, 25, 400, height - 40, 24);
+  rect(width/2 - 194, telefonoY + 5, 400, altoTelefono, 24);
 
-  fill(45, 52, 54);
-  stroke(45, 52, 54);
+  fill(60, 50, 40);
+  stroke(60, 50, 40);
   strokeWeight(3);
-  rect(width/2 - 200, 20, 400, height - 40, 20);
+  rect(width/2 - 200, telefonoY, 400, altoTelefono, 18);
 
-  fill(248, 246, 240);
+  fill(245, 235, 210);
   noStroke();
-  rect(width/2 - 192, 28, 384, height - 56, 15);
+  rect(width/2 - 192, telefonoY + 8, 384, altoTelefono - 16, 14);
 
   // Encabezado
-  fill(108, 92, 231);
-  rect(width/2 - 192, 28, 384, 48, 15, 15, 0, 0);
+  fill(40, 60, 140);
+  rect(width/2 - 192, telefonoY + 8, 384, 48, 12, 12, 0, 0);
 
   // Muesca superior y cámara
-  fill(45, 52, 54);
-  rect(width/2 - 52, 25, 104, 20, 10);
-  fill(108, 92, 231);
-  ellipse(width/2 + 28, 35, 7, 7);
+  fill(60, 50, 40);
+  rect(width/2 - 52, telefonoY + 5, 104, 20, 10);
+  fill(40, 60, 140);
+  ellipse(width/2 + 28, telefonoY + 15, 7, 7);
 
   fill(255);
   textAlign(CENTER, CENTER);
   textSize(15);
   String nombreEscenario = (escenario == 1) ? "BARRIO" : (escenario == 2) ? "COLEGIO" : "ELECCIÓN";
-  text("RED CONECTA - " + nombreEscenario, width/2, 58);
+  text("RED CONECTA - " + nombreEscenario, width/2, telefonoY + 38);
 
   // Buscar publicación para el escenario actual
   int idx = obtenerIndicePublicacion(escenario);
@@ -1675,65 +1683,62 @@ void dibujarPantallaConecta() {
 
     dibujarConectaColegio();
 
-    popStyle();
-    return;
-  }
-
-  if (idx != -1 && !pubProcesadas[idx]) {
+  } else if (idx != -1 && !pubProcesadas[idx]) {
     // Tarjeta de publicación con sombra tenue
     fill(45, 52, 54, 35);
     noStroke();
-    rect(width/2 - 176, 84, 360, 140, 14);
+    rect(width/2 - 176, telefonoY + 68, 360, 140, 14);
     fill(255);
     stroke(228, 225, 220);
     strokeWeight(1);
-    rect(width/2 - 180, 80, 360, 140, 14);
+    rect(width/2 - 180, telefonoY + 64, 360, 140, 14);
 
     // Avatar circular simulado
-    fill(108, 92, 231);
+    fill(196, 180, 225);
     noStroke();
-    ellipse(width/2 - 153, 103, 30, 30);
+    ellipse(width/2 - 153, telefonoY + 87, 30, 30);
     fill(255);
     textAlign(CENTER, CENTER);
     textSize(14);
     String inicialAutor = pubAutores[idx].substring(1, 2).toUpperCase();
-    text(inicialAutor, width/2 - 153, 103);
+    text(inicialAutor, width/2 - 153, telefonoY + 87);
 
     fill(45, 52, 54);
     textAlign(LEFT, TOP);
     textSize(12);
-    text(pubAutores[idx], width/2 - 132, 92);
+    text(pubAutores[idx], width/2 - 132, telefonoY + 76);
     fill(112, 106, 115);
     textSize(10);
-    text("Confiabilidad: " + pubConfiabilidad[idx] + "%  |  Viralidad: " + pubViralidad[idx] + "%", width/2 - 132, 108);
+    text("Confiabilidad: " + pubConfiabilidad[idx] + "%  |  Viralidad: " + pubViralidad[idx] + "%", width/2 - 132, telefonoY + 92);
 
     fill(45, 52, 54);
     textSize(13);
     textLeading(18);
-    text(pubTitulos[idx], width/2 - 165, 135, 330, 80);
+    text(pubTitulos[idx], width/2 - 165, telefonoY + 119, 330, 80);
 
     // Botones de decisión (1, 2, 3)
-    dibujarBotonOpcion(width/2 - 170, 235, "L1. Compartir (Aumenta Viralidad)", color(220, 80, 80));
-    dibujarBotonOpcion(width/2 - 170, 280, "R1. Verificar / Reportar", color(80, 180, 100));
-    dibujarBotonOpcion(width/2 - 170, 325, "L2. Ignorar Publicación", color(120, 130, 140));
+    dibujarBotonOpcion(width/2 - 170, telefonoY + 219, "L1. Compartir (Aumenta Viralidad)", color(170, 70, 60));
+    dibujarBotonOpcion(width/2 - 170, telefonoY + 264, "R1. Verificar / Reportar", color(60, 150, 70));
+    dibujarBotonOpcion(width/2 - 170, telefonoY + 309, "L2. Ignorar Publicación", color(180, 170, 150));
   } else {
     fill(112, 106, 115);
     textAlign(CENTER, CENTER);
     textSize(14);
-    text("No hay publicaciones pendientes\nen esta zona de la ciudad.", width/2, height/2 - 10);
+    text("No hay publicaciones pendientes\nen esta zona de la ciudad.", width/2, telefonoY + altoTelefono/2 - 10);
   }
 
   // Indicación de cierre
   fill(112, 106, 115);
   textSize(11);
   textAlign(CENTER);
-  text("[ Presiona C, Cuadrado o Clic en el icono para Cerrar ]", width/2, height - 30);
+  text("[ Presiona C, Cuadrado o Clic en el icono para Cerrar ]", width/2, telefonoY + altoTelefono - 22);
 
   popStyle();
 }
 
 void dibujarBotonOpcion(float x, float y, String texto, int c) {
-  fill(45, 52, 54, 35);
+  textFont(fuenteConecta);
+  fill(60, 50, 40, 35);
   noStroke();
   rect(x + 2, y + 3, 340, 36, 12);
 
@@ -3363,6 +3368,8 @@ void dibujarPuntosAcopioColegio() {
   popStyle();
 }
 void dibujarConectaColegio() {
+  float telefonoY = height/2 - 560/2;
+
   if (
     publicacionColegioActual != -1 &&
     publicacionVerificadaColegio[publicacionColegioActual]
@@ -3371,23 +3378,23 @@ void dibujarConectaColegio() {
     dibujarResultadoInvestigacionColegio();
     return;
   }
-  fill(255);
+  fill(40, 60, 140);
   textAlign(CENTER, CENTER);
 
   textSize(18);
   text(
     "TENDENCIAS ELECTORALES EN EL COLEGIO",
     width/2,
-    90
+    telefonoY + 75
   );
 
   textSize(13);
-  fill(190);
+  fill(112, 106, 115);
 
   text(
     "Selecciona una situación para investigarla",
     width/2,
-    120
+    telefonoY + 100
   );
 
   // =====================================================
@@ -3395,37 +3402,40 @@ void dibujarConectaColegio() {
   // =====================================================
   if (!crisisColegioResuelta[0]){
 
-    fill(35, 42, 55);
-    stroke(80);
-    strokeWeight(2);
+    fill(60, 50, 40, 35);
+    noStroke();
+    rect(width/2 - 167, telefonoY + 124, 340, 100, 12);
+    fill(255);
+    stroke(228, 225, 220);
+    strokeWeight(1);
 
     rect(
       width/2 - 170,
-      155,
+      telefonoY + 120,
       340,
-      110,
-      10
+      100,
+      12
     );
 
-    fill(255);
+    fill(45, 52, 54);
     textAlign(LEFT, TOP);
     textSize(13);
 
     text(
       publicacionesColegio[0],
       width/2 - 150,
-      170,
+      telefonoY + 135,
       300,
       50
     );
 
-    fill(255, 100, 100);
+    fill(170, 70, 60);
     textSize(12);
 
     text(
       "Viralidad: " + round(viralidadColegio[0]) + "%",
       width/2 - 150,
-      230
+      telefonoY + 195
     );
 
   }
@@ -3433,36 +3443,40 @@ void dibujarConectaColegio() {
   // PUBLICACIÓN 2
   // =====================================================
   if (!crisisColegioResuelta[1]) {
-    fill(35, 42, 55);
-    stroke(80);
+    fill(60, 50, 40, 35);
+    noStroke();
+    rect(width/2 - 167, telefonoY + 239, 340, 100, 12);
+    fill(255);
+    stroke(228, 225, 220);
+    strokeWeight(1);
 
     rect(
       width/2 - 170,
-      285,
+      telefonoY + 235,
       340,
-      110,
-      10
+      100,
+      12
     );
 
-    fill(255);
+    fill(45, 52, 54);
     textAlign(LEFT, TOP);
     textSize(13);
 
     text(
       publicacionesColegio[1],
       width/2 - 150,
-      300,
+      telefonoY + 250,
       300,
       50
     );
 
-    fill(255, 100, 100);
+    fill(170, 70, 60);
     textSize(12);
 
     text(
       "Viralidad: " + round(viralidadColegio[1]) + "%",
       width/2 - 150,
-      360
+      telefonoY + 310
     );
 
   }
@@ -3470,36 +3484,40 @@ void dibujarConectaColegio() {
   // PUBLICACIÓN 3
   // =====================================================
   if (!crisisColegioResuelta[2]) {
-    fill(35, 42, 55);
-    stroke(80);
+    fill(60, 50, 40, 35);
+    noStroke();
+    rect(width/2 - 167, telefonoY + 354, 340, 100, 12);
+    fill(255);
+    stroke(228, 225, 220);
+    strokeWeight(1);
 
     rect(
       width/2 - 170,
-      415,
+      telefonoY + 350,
       340,
-      110,
-      10
+      100,
+      12
     );
 
-    fill(255);
+    fill(45, 52, 54);
     textAlign(LEFT, TOP);
     textSize(13);
 
     text(
       publicacionesColegio[2],
       width/2 - 150,
-      430,
+      telefonoY + 365,
       300,
       50
     );
 
-    fill(255, 100, 100);
+    fill(170, 70, 60);
     textSize(12);
 
     text(
       "Viralidad: " + round(viralidadColegio[2]) + "%",
       width/2 - 150,
-      490
+      telefonoY + 425
     );
   }
 
@@ -3507,14 +3525,14 @@ void dibujarConectaColegio() {
   // CONTROLES
   // =====================================================
 
-  fill(200);
+  fill(112, 106, 115);
   textAlign(CENTER, CENTER);
   textSize(13);
 
   text(
     "L1 = Primera   R1 = Segunda   L2 = Tercera",
     width/2,
-    560
+    telefonoY + 480
   );
 }
 void revisarPuntoAcopioColegio() {
@@ -3621,6 +3639,7 @@ void comprobarSituacionColegio() {
   XpresionadoAntes = xAhora;
 }
 void dibujarResultadoInvestigacionColegio() {
+  float telefonoY = height/2 - 560/2;
 
   if (publicacionColegioActual == -1) {
     return;
@@ -3630,17 +3649,17 @@ void dibujarResultadoInvestigacionColegio() {
     return;
   }
 
-  fill(255);
+  fill(40, 60, 140);
   textAlign(CENTER, TOP);
   textSize(18);
 
   text(
     "RESULTADO DE LA VERIFICACIÓN",
     width/2,
-    105
+    telefonoY + 90
   );
 
-  fill(200);
+  fill(45, 52, 54);
   textSize(14);
 
   if (publicacionColegioActual == 0) {
@@ -3650,7 +3669,7 @@ void dibujarResultadoInvestigacionColegio() {
       "La propuesta completa no decía que se eliminarían\n" +
       "los apoyos estudiantiles.",
       width/2,
-      155
+      telefonoY + 135
     );
 
   } else if (publicacionColegioActual == 1) {
@@ -3660,7 +3679,7 @@ void dibujarResultadoInvestigacionColegio() {
       "de estudiantes y no representa a todo el colegio.\n" +
       "El porcentaje publicado exagera el resultado.",
       width/2,
-      155
+      telefonoY + 135
     );
   } else if (publicacionColegioActual == 2) {
 
@@ -3669,7 +3688,7 @@ void dibujarResultadoInvestigacionColegio() {
       "No hubo disturbios ni fue suspendido.\n" +
       "La publicación difundió un rumor falso.",
       width/2,
-      155
+      telefonoY + 135
     );
   }
 
@@ -3678,33 +3697,33 @@ void dibujarResultadoInvestigacionColegio() {
   // =====================================================
 
   textSize(14);
-  fill(255);
+  fill(45, 52, 54);
 
   text(
     "¿Qué quieres hacer en Conecta?",
     width/2,
-    265
+    telefonoY + 205
   );
 
   dibujarBotonOpcion(
     width/2 - 170,
-    310,
+    telefonoY + 245,
     "L1. Compartir publicación",
-    color(220, 80, 80)
+    color(170, 70, 60)
   );
 
   dibujarBotonOpcion(
     width/2 - 170,
-    365,
+    telefonoY + 300,
     "R1. Reportar / corregir",
-    color(80, 180, 100)
+    color(60, 150, 70)
   );
 
   dibujarBotonOpcion(
     width/2 - 170,
-    420,
+    telefonoY + 355,
     "L2. Ignorar",
-    color(120, 130, 140)
+    color(180, 170, 150)
   );
 }
 void procesarDecisionColegio(int opcion) {

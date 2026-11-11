@@ -99,7 +99,8 @@ boolean[] pubProcesadas = {
   false
 };
 
-PFont fuenteConecta;
+PFont fuenteTitulo;
+PFont fuenteCuerpo;
 
 boolean redSocialAbierta = false;
 boolean mostrarTipConecta = false;
@@ -417,7 +418,8 @@ float oscuridadPlaza = 0;
 
 void setup() {
   size(1500, 900);
-  fuenteConecta = createFont("SansSerif.bold", 14);
+  fuenteTitulo = createFont("Trebuchet MS Bold", 18);
+  fuenteCuerpo = createFont("Trebuchet MS", 13);
 
   cargarEscenario(1);
 
@@ -1315,6 +1317,7 @@ void fondoBarrio() {
   fill(40, 60, 140);
   rect(1750, 556, 300, 32, 8);
   fill(255);
+  textFont(fuenteTitulo);
   textAlign(CENTER, CENTER);
   textSize(18);
   text("TORNEO DEPORTIVO", 1900, 571);
@@ -1383,6 +1386,7 @@ void fondoColegio() {
   fill(250, 245, 225);
   rect(925, 2, 150, 24, 4);
   fill(50);
+  textFont(fuenteTitulo);
   textAlign(CENTER, CENTER);
   textSize(14);
   text("COLEGIO NOVA", 1000, 14);
@@ -1462,6 +1466,7 @@ void fondoPlaza() {
   fill(245, 235, 200);
   rect(705, 20, 235, 67);
   fill(50);
+  textFont(fuenteTitulo);
   textAlign(CENTER);
   textSize(18);
   text("ELECCIONES MUNICIPALES", 822, 45);
@@ -1568,7 +1573,7 @@ void dibujarTipConecta() {
   }
 
   pushStyle();
-  textFont(fuenteConecta);
+  textFont(fuenteCuerpo);
   rectMode(CORNER);
 
   float tarjetaX = width/2 - 250;
@@ -1633,7 +1638,7 @@ void dibujarIconoRedSocial() {
 
 void dibujarPantallaConecta() {
   pushStyle();
-  textFont(fuenteConecta);
+  textFont(fuenteCuerpo);
 
   float altoTelefono = 560;
   float telefonoY = height/2 - altoTelefono/2;
@@ -1737,7 +1742,7 @@ void dibujarPantallaConecta() {
 }
 
 void dibujarBotonOpcion(float x, float y, String texto, int c) {
-  textFont(fuenteConecta);
+  textFont(fuenteCuerpo);
   fill(60, 50, 40, 35);
   noStroke();
   rect(x + 2, y + 3, 340, 36, 12);
@@ -1991,10 +1996,12 @@ void mostrarIndicadores() {
   rect(15, 15, 230, 145, 10);
 
   fill(255);
+  textFont(fuenteTitulo);
   textAlign(LEFT);
   textSize(20);
   text("ESTADO DE NOVA", 30, 40);
 
+  textFont(fuenteCuerpo);
   textSize(16);
   text("Informacion: " + informacion, 30, 65);
   text("Convivencia: " + convivencia, 30, 85);
@@ -2795,6 +2802,7 @@ void dibujarDialogoBombero() {
 
   // NOMBRE DEL NPC
   fill(255, 210, 60);
+  textFont(fuenteTitulo);
   textAlign(LEFT, TOP);
   textSize(28);
 
@@ -2806,6 +2814,7 @@ void dibujarDialogoBombero() {
 
   // TEXTO DEL DIÁLOGO
   fill(255);
+  textFont(fuenteCuerpo);
   textSize(24);
 
   if (dialogoBombero == 1) {
@@ -2835,6 +2844,7 @@ void dibujarDialogoBombero() {
 
   // INDICACIÓN
   fill(200);
+  textFont(fuenteCuerpo);
   textAlign(RIGHT, BOTTOM);
   textSize(12);
 
@@ -3913,11 +3923,13 @@ void dibujarDialogoLaura() {
 
   noStroke();
   fill(255, 210, 60);
+  textFont(fuenteTitulo);
   textAlign(LEFT, TOP);
   textSize(28);
   text("Laura", 100, 265);
 
   fill(255);
+  textFont(fuenteCuerpo);
   textSize(20);
 
   if (crisisColegioCompletadas < 3) {
@@ -3947,6 +3959,7 @@ void dibujarDialogoLaura() {
   }
 
   fill(200);
+  textFont(fuenteCuerpo);
   textAlign(RIGHT, BOTTOM);
   textSize(12);
   text("□ Continuar", width - 100, 360);
@@ -4082,6 +4095,7 @@ void dibujarMinijuegoPlaza() {
   );
 
   fill(248, 246, 240);
+  textFont(fuenteTitulo);
   textAlign(CENTER, TOP);
   textSize(22);
   text(
@@ -4091,6 +4105,7 @@ void dibujarMinijuegoPlaza() {
   );
 
   fill(190);
+  textFont(fuenteCuerpo);
   textSize(13);
   text(
     "Rastrea perfiles sospechosos y verifica su identidad digital",
@@ -4111,6 +4126,7 @@ void dibujarMinijuegoPlaza() {
     fill(248, 246, 240);
     ellipse(perfilX, perfilY, 42, 42);
     fill(45, 52, 54);
+    textFont(fuenteCuerpo);
     textAlign(CENTER, CENTER);
     textSize(12);
     text(perfilesSospechososPlaza[i].substring(1, 2).toUpperCase(), perfilX, perfilY);
@@ -4129,6 +4145,7 @@ void dibujarMinijuegoPlaza() {
 
   noStroke();
   fill(220);
+  textFont(fuenteCuerpo);
   textAlign(LEFT, BOTTOM);
   textSize(12);
   text("X / Clic: escanear   |   R1: desmantelar bot   |   L1: confirmar ciudadano", 150, 515);
@@ -4151,11 +4168,13 @@ void dibujarTarjetaMetadatosPlaza() {
   rect(tarjetaX, tarjetaY, 440, 150, 14);
 
   fill(108, 220, 231);
+  textFont(fuenteTitulo);
   textAlign(LEFT, TOP);
   textSize(18);
   text("PERFIL ESCANEADO", tarjetaX + 22, tarjetaY + 18);
 
   fill(248, 246, 240);
+  textFont(fuenteCuerpo);
   textSize(15);
   text(perfilesSospechososPlaza[perfilSeleccionadoPlaza], tarjetaX + 22, tarjetaY + 50);
   fill(210);

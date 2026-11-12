@@ -3,7 +3,7 @@
 // =====================================================
 
 // Estado general del minijuego
-boolean minijuegoColegioActivo = true;
+boolean minijuegoColegioActivo = false;
 boolean minijuegoColegioTerminado = false;
 
 // Publicación que el jugador está investigando
@@ -223,16 +223,24 @@ void dibujarConectaColegio() {
       12
     );
 
-    fill(45, 52, 54);
+    fill(112, 106, 115);
     textAlign(LEFT, TOP);
+    textSize(11);
+    text(
+      autoresColegio[0],
+      width/2 - 150,
+      telefonoY + 130
+    );
+
+    fill(45, 52, 54);
     textSize(13);
 
     text(
       publicacionesColegio[0],
       width/2 - 150,
-      telefonoY + 135,
+      telefonoY + 148,
       300,
-      50
+      42
     );
 
     fill(170, 70, 60);
@@ -264,16 +272,24 @@ void dibujarConectaColegio() {
       12
     );
 
-    fill(45, 52, 54);
+    fill(112, 106, 115);
     textAlign(LEFT, TOP);
+    textSize(11);
+    text(
+      autoresColegio[1],
+      width/2 - 150,
+      telefonoY + 245
+    );
+
+    fill(45, 52, 54);
     textSize(13);
 
     text(
       publicacionesColegio[1],
       width/2 - 150,
-      telefonoY + 250,
+      telefonoY + 263,
       300,
-      50
+      42
     );
 
     fill(170, 70, 60);
@@ -305,16 +321,24 @@ void dibujarConectaColegio() {
       12
     );
 
-    fill(45, 52, 54);
+    fill(112, 106, 115);
     textAlign(LEFT, TOP);
+    textSize(11);
+    text(
+      autoresColegio[2],
+      width/2 - 150,
+      telefonoY + 360
+    );
+
+    fill(45, 52, 54);
     textSize(13);
 
     text(
       publicacionesColegio[2],
       width/2 - 150,
-      telefonoY + 365,
+      telefonoY + 378,
       300,
-      50
+      42
     );
 
     fill(170, 70, 60);

@@ -548,24 +548,19 @@ void actualizarViajePlaza() {
   );
 
   if (oscuridadPlaza >= 255) {
-
-    cargarEscenario(3);
-
-    jugadorX = 1100;
-    jugadorY = 700;
-
     viajandoAPlaza = false;
-
     oscuridadPlaza = 0;
 
     busPlazaX = -180;
-
     busPlazaDetenido = false;
-
     busPlazaYaParo = false;
-
     tiempoBusPlazaDetenido = 0;
-
     cercaBusPlaza = false;
+
+    slideOutroActo2 = 1;
+    caracteresVisiblesActo2 = 0;
+    tiempoInicioOutroActo2 = millis();
+    ultimoTipeadoActo2 = tiempoInicioOutroActo2;
+    estadoJuego = ESTADO_OUTRO_ACTO2;
   }
 }

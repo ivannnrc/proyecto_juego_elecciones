@@ -20,6 +20,24 @@ final int ESTADO_INTRO = 0;
 final int ESTADO_JUEGO = 1;
 final int ESTADO_MINIJUEGO1 = 2;
 
+final int ESTADO_OUTRO_MJ1 = 3;
+int slideOutroMJ1 = 1;
+int tiempoInicioOutroMJ1 = 0;
+int caracteresVisiblesOutro = 0;
+int ultimoTipeadoOutro = 0;
+
+final int ESTADO_OUTRO_ACTO2 = 4;
+int slideOutroActo2 = 1;
+int tiempoInicioOutroActo2 = 0;
+int caracteresVisiblesActo2 = 0;
+int ultimoTipeadoActo2 = 0;
+
+final int ESTADO_FINAL = 5;
+int slideFinal = 1;
+int tiempoInicioFinal = 0;
+int caracteresVisiblesFinal = 0;
+int ultimoTipeadoFinal = 0;
+
 int estadoJuego = 0;
 int slideActual = 1;
 int tiempoInicioSlide = 0;
@@ -122,6 +140,29 @@ void draw() {
   if (estadoJuego == ESTADO_MINIJUEGO1) {
     pushStyle();
     actualizarMinijuego1();
+    popStyle();
+    return;
+  }
+  if (estadoJuego == ESTADO_OUTRO_MJ1) {
+    pushStyle();
+    actualizarControlOutroMJ1();
+    dibujarOutroMinijuego1();
+    popStyle();
+    return;
+  }
+
+ if (estadoJuego == ESTADO_OUTRO_ACTO2) {
+    pushStyle();
+    actualizarControlOutroActo2();
+    dibujarOutroActo2();
+    popStyle();
+    return;
+  }
+
+  if (estadoJuego == ESTADO_FINAL) {
+    pushStyle();
+    actualizarControlFinal();
+    dibujarPantallaFinal();
     popStyle();
     return;
   }
@@ -466,6 +507,29 @@ void keyPressed() {
     return;
   }
 
+  if (estadoJuego == ESTADO_OUTRO_MJ1) {
+    if (key == ENTER || key == RETURN || key == ' ') {
+      avanzarSlideOutroMJ1();
+    }
+    return;
+  }
+
+  if (estadoJuego == ESTADO_OUTRO_ACTO2) {
+    if (key == ENTER || key == RETURN || key == ' ') {
+      avanzarSlideOutroActo2();
+    }
+    return;
+  }
+
+  if (estadoJuego == ESTADO_FINAL) {
+    if (key == ENTER || key == RETURN || key == ' ') {
+      avanzarSlideFinal();
+    } else if (key == 'r' || key == 'R') {
+      reiniciarJuegoCompleto();
+    }
+    return;
+  }
+
   if (
     estadoJuego == ESTADO_JUEGO &&
     (key == 'e' || key == 'E') &&
@@ -516,6 +580,21 @@ void mousePressed() {
     return;
   }
 
+  if (estadoJuego == ESTADO_OUTRO_MJ1) {
+    avanzarSlideOutroMJ1();
+    return;
+  }
+
+  if (estadoJuego == ESTADO_OUTRO_ACTO2) {
+    avanzarSlideOutroActo2();
+    return;
+  }
+
+  if (estadoJuego == ESTADO_FINAL) {
+    avanzarSlideFinal();
+    return;
+  }
+
   if (estadoJuego == ESTADO_JUEGO && manejarClicMinijuego1()) {
     return;
   }
@@ -539,4 +618,359 @@ void mousePressed() {
       }
     }
   }
+}
+
+void actualizarControlOutroMJ1() {
+  if (!mandoConectado || botonX == null) {
+    XpresionadoAntes = false;
+    return;
+  }
+  boolean xAhora = botonX.pressed();
+  if (xAhora && !XpresionadoAntes) {
+    avanzarSlideOutroMJ1();
+  }
+  XpresionadoAntes = xAhora;
+}
+
+void avanzarSlideOutroMJ1() {
+  String textoActual = obtenerTextoOutroMJ1(slideOutroMJ1);
+  if (caracteresVisiblesOutro < textoActual.length()) {
+    caracteresVisiblesOutro = textoActual.length();
+    ultimoTipeadoOutro = millis();
+    return;
+  }
+
+  slideOutroMJ1++;
+  if (slideOutroMJ1 > 2) {
+    regresarAlColegioDesdeCarrera();
+    return;
+  }
+
+  tiempoInicioOutroMJ1 = millis();
+  ultimoTipeadoOutro = tiempoInicioOutroMJ1;
+  caracteresVisiblesOutro = 0;
+}
+
+String obtenerTextoOutroMJ1(int slide) {
+  if (resultadoCarrera == 1) {
+    return slide == 1
+      ? "Filtraste el ruido de la red y bloqueaste la desinformación antes de que se volviera viral en Conecta."
+      : "Llegas al Colegio Nova con tu reputación intacta, pero aún quedan rumores sueltos en los pasillos que debes investigar.";
+  } else if (resultadoCarrera == 2) {
+    return slide == 1
+      ? "Lograste esquivar lo peor, pero dejaste pasar demasiadas alertas sin verificar su origen en la red."
+      : "El ambiente en el Colegio Nova es incierto. Los estudiantes dudan y tendrás que comprobar los hechos en persona.";
+  } else {
+    return slide == 1
+      ? "La desinformación te superó. El rumor falso sobre las elecciones ya se compartió masivamente en todo el colegio."
+      : "Entras al Colegio Nova en medio de la tensión. Tu reputación cayó y debes contener la crisis antes del debate.";
+  }
+}
+
+void dibujarOutroMinijuego1() {
+  String texto = obtenerTextoOutroMJ1(slideOutroMJ1);
+  int ahora = millis();
+  while (caracteresVisiblesOutro < texto.length() && ahora - ultimoTipeadoOutro >= 32) {
+    caracteresVisiblesOutro++;
+    ultimoTipeadoOutro += 32;
+  }
+
+  dibujarFondoNovelaGrafica();
+
+  color colorRuta = resultadoCarrera == 1 ? color(87, 176, 116)
+                  : resultadoCarrera == 2 ? color(108, 92, 231)
+                  : color(232, 111, 105);
+
+  String etiquetaRuta = resultadoCarrera == 1 ? "R U T A :   V E R I F I C A D O R   D I G I T A L"
+                      : resultadoCarrera == 2 ? "R U T A :   O B S E R V A D O R   P A S I V O"
+                      : "R U T A :   C A O S   V I R A L";
+
+  float cajaW = width * 0.68;
+  float cajaH = 330;
+  float cajaX = (width - cajaW) / 2;
+  float cajaY = (height - cajaH) / 2 - 12;
+
+  rectMode(CORNER);
+  fill(35, 38, 34, 90);
+  noStroke();
+  rect(cajaX + 8, cajaY + 12, cajaW, cajaH, 20);
+  fill(45, 52, 54, 225);
+  stroke(colorRuta);
+  strokeWeight(3);
+  rect(cajaX, cajaY, cajaW, cajaH, 20);
+  noStroke();
+
+  fill(colorRuta);
+  textFont(fuenteTitulo);
+  textAlign(CENTER, CENTER);
+  textSize(16);
+  text(etiquetaRuta, width / 2, cajaY + 57);
+
+  String visible = texto.substring(0, min(caracteresVisiblesOutro, texto.length()));
+  fill(248, 246, 240);
+  textFont(fuenteConecta);
+  textSize(32);
+  textAlign(CENTER, CENTER);
+  text(visible, cajaX + 52, cajaY + 92, cajaW - 104, cajaH - 135);
+
+  stroke(255, 255, 255, 35);
+  strokeWeight(1);
+  line(cajaX + 52, cajaY + cajaH - 48, cajaX + cajaW - 52, cajaY + cajaH - 48);
+
+  dibujarIndicadorIntro();
+}
+
+void actualizarControlOutroActo2() {
+  if (!mandoConectado || botonX == null) {
+    XpresionadoAntes = false;
+    return;
+  }
+  boolean xAhora = botonX.pressed();
+  if (xAhora && !XpresionadoAntes) {
+    avanzarSlideOutroActo2();
+  }
+  XpresionadoAntes = xAhora;
+}
+
+void avanzarSlideOutroActo2() {
+  String textoActual = obtenerTextoOutroActo2(slideOutroActo2);
+  if (caracteresVisiblesActo2 < textoActual.length()) {
+    caracteresVisiblesActo2 = textoActual.length();
+    ultimoTipeadoActo2 = millis();
+    return;
+  }
+
+  slideOutroActo2++;
+  if (slideOutroActo2 > 2) {
+    cargarEscenario(3);
+    jugadorX = 1100;
+    jugadorY = 700;
+    actualizarCamara();
+    estadoJuego = ESTADO_JUEGO;
+    return;
+  }
+
+  tiempoInicioOutroActo2 = millis();
+  ultimoTipeadoActo2 = tiempoInicioOutroActo2;
+  caracteresVisiblesActo2 = 0;
+}
+
+String obtenerTextoOutroActo2(int slide) {
+  if (slide == 1) {
+    return "Con las crisis del Colegio Nova resueltas, subes al bus rumbo al centro de la ciudad mientras las redes siguen ardiendo.";
+  } else {
+    return "En Plaza Nova está por comenzar el Debate Ciudadano. Busca a la periodista Laura para rastrear los bots que intentan manipular la elección.";
+  }
+}
+
+void dibujarOutroActo2() {
+  String texto = obtenerTextoOutroActo2(slideOutroActo2);
+  int ahora = millis();
+  while (caracteresVisiblesActo2 < texto.length() && ahora - ultimoTipeadoActo2 >= 32) {
+    caracteresVisiblesActo2++;
+    ultimoTipeadoActo2 += 32;
+  }
+
+  dibujarFondoNovelaGrafica();
+
+  color colorAcento = color(108, 92, 231);
+  String etiqueta = "A C T O   I I I   /   R U M B O   A   P L A Z A   N O V A";
+
+  float cajaW = width * 0.68;
+  float cajaH = 330;
+  float cajaX = (width - cajaW) / 2;
+  float cajaY = (height - cajaH) / 2 - 12;
+
+  rectMode(CORNER);
+  fill(35, 38, 34, 90);
+  noStroke();
+  rect(cajaX + 8, cajaY + 12, cajaW, cajaH, 20);
+  fill(45, 52, 54, 225);
+  stroke(colorAcento);
+  strokeWeight(3);
+  rect(cajaX, cajaY, cajaW, cajaH, 20);
+  noStroke();
+
+  fill(196, 180, 225);
+  textFont(fuenteTitulo);
+  textAlign(CENTER, CENTER);
+  textSize(16);
+  text(etiqueta, width / 2, cajaY + 57);
+
+  String visible = texto.substring(0, min(caracteresVisiblesActo2, texto.length()));
+  fill(248, 246, 240);
+  textFont(fuenteConecta);
+  textSize(32);
+  textAlign(CENTER, CENTER);
+  text(visible, cajaX + 52, cajaY + 92, cajaW - 104, cajaH - 135);
+
+  stroke(255, 255, 255, 35);
+  strokeWeight(1);
+  line(cajaX + 52, cajaY + cajaH - 48, cajaX + cajaW - 52, cajaY + cajaH - 48);
+
+  dibujarIndicadorIntro();
+}
+
+int calcularRangoFinal() {
+  int puntos = 0;
+
+  // Acto I: Carrera de Datos
+  if (resultadoCarrera == 1) puntos += 2;
+  else if (resultadoCarrera == 2) puntos += 1;
+
+  // Acto II: Crisis en el Colegio
+  if (crisisColegioCompletadas >= 3) puntos += 2;
+  else if (crisisColegioCompletadas >= 1) puntos += 1;
+
+  // Acto III: Escáner de Bots en la Plaza
+  if (!derrotaPlaza && botsDesmanteladosPlaza >= 3 && vidasPlaza >= 2) puntos += 2;
+  else if (!derrotaPlaza && botsDesmanteladosPlaza >= 1) puntos += 1;
+
+  if (puntos >= 5) return 1;      // Final Óptimo
+  else if (puntos >= 3) return 2; // Final Intermedio
+  else return 3;                  // Final Crítico
+}
+
+void actualizarControlFinal() {
+  if (!mandoConectado || botonX == null) {
+    XpresionadoAntes = false;
+    return;
+  }
+  boolean xAhora = botonX.pressed();
+  if (xAhora && !XpresionadoAntes) {
+    avanzarSlideFinal();
+  }
+  XpresionadoAntes = xAhora;
+}
+
+void avanzarSlideFinal() {
+  String textoActual = obtenerTextoFinal(slideFinal);
+  if (caracteresVisiblesFinal < textoActual.length()) {
+    caracteresVisiblesFinal = textoActual.length();
+    ultimoTipeadoFinal = millis();
+    return;
+  }
+
+  if (slideFinal == 1) {
+    slideFinal = 2;
+    tiempoInicioFinal = millis();
+    ultimoTipeadoFinal = tiempoInicioFinal;
+    caracteresVisiblesFinal = 0;
+  } else {
+    reiniciarJuegoCompleto();
+  }
+}
+
+void reiniciarJuegoCompleto() {
+  minijuego1Activo = false;
+  minijuego1IniciadoAntes = false;
+  mostrarAvisoMinijuego1 = false;
+  minijuegoColegioActivo = false;
+  minijuegoColegioTerminado = false;
+  minijuegoPlazaActivo = false;
+  minijuegoPlazaTerminado = false;
+  crisisColegioCompletadas = 0;
+  for (int i = 0; i < 3; i++) {
+    crisisColegioResuelta[i] = false;
+    publicacionVerificadaColegio[i] = false;
+    pubProcesadas[i] = false;
+  }
+
+  slideActual = 1;
+  tiempoInicioSlide = millis();
+  caracteresVisibles = 0;
+  ultimoTipeado = tiempoInicioSlide;
+  estadoJuego = ESTADO_INTRO;
+}
+
+String obtenerTextoFinal(int slide) {
+  int rango = calcularRangoFinal();
+
+  if (rango == 1) {
+    return slide == 1
+      ? "Verificaste los datos en la red, calmaste las tensiones en el Colegio Nova y desmantelaste los bots del debate sin censurar voces reales."
+      : "Gracias a tu criterio crítico, las elecciones municipales se desarrollan con transparencia. ¡Eres un referente de Ciudadanía Digital!";
+  } else if (rango == 2) {
+    return slide == 1
+      ? "Lograste frenar varias noticias falsas en el colegio y la plaza, aunque algunas dudas y cuentas automatizadas lograron confundir a parte de los vecinos."
+      : "Nova llega a las elecciones con un clima dividido. Cada publicación que compartes sigue teniendo peso en la convivencia de tu comunidad.";
+  } else {
+    return slide == 1
+      ? "La desinformación se salió de control: entre rumores virales y errores de moderación, la confianza ciudadana en Plaza Nova se quebró."
+      : "El debate terminó entre acusaciones cruzadas. Verificar las fuentes antes de reaccionar es la única forma de proteger la democracia.";
+  }
+}
+
+void dibujarPantallaFinal() {
+  String texto = obtenerTextoFinal(slideFinal);
+  int ahora = millis();
+  while (caracteresVisiblesFinal < texto.length() && ahora - ultimoTipeadoFinal >= 32) {
+    caracteresVisiblesFinal++;
+    ultimoTipeadoFinal += 32;
+  }
+
+  dibujarFondoNovelaGrafica();
+
+  int rango = calcularRangoFinal();
+  color colorFinal = rango == 1 ? color(87, 176, 116)
+                   : rango == 2 ? color(108, 92, 231)
+                   : color(232, 111, 105);
+
+  String tituloFinal = rango == 1 ? "F I N A L :   C I U D A D A N O   D I G I T A L   E J E M P L A R"
+                     : rango == 2 ? "F I N A L :   O B S E R V A D O R   E N   C O N S T R U C C I Ó N"
+                     : "F I N A L :   C R I S I S   D E   D E S I N F O R M A C I Ó N";
+
+  float cajaW = width * 0.72;
+  float cajaH = 390;
+  float cajaX = (width - cajaW) / 2;
+  float cajaY = (height - cajaH) / 2 - 15;
+
+  rectMode(CORNER);
+  fill(35, 38, 34, 90);
+  noStroke();
+  rect(cajaX + 8, cajaY + 12, cajaW, cajaH, 20);
+  fill(45, 52, 54, 230);
+  stroke(colorFinal);
+  strokeWeight(3);
+  rect(cajaX, cajaY, cajaW, cajaH, 20);
+  noStroke();
+
+  fill(colorFinal);
+  textFont(fuenteTitulo);
+  textAlign(CENTER, CENTER);
+  textSize(17);
+  text(tituloFinal, width / 2, cajaY + 48);
+
+  // Resumen numérico de los 3 actos en la parte superior de la tarjeta
+  fill(196, 180, 225);
+  textFont(fuenteCuerpo);
+  textSize(14);
+  String resumenActos =
+    "Acto I (Red): " + (resultadoCarrera == 1 ? "Verificador" : resultadoCarrera == 2 ? "Pasivo" : "Caos Viral") +
+    "   |   Acto II (Colegio): " + crisisColegioCompletadas + "/3 resueltas" +
+    "   |   Acto III (Plaza): " + botsDesmanteladosPlaza + " bots desmantelados";
+  text(resumenActos, width / 2, cajaY + 84);
+
+  String visible = texto.substring(0, min(caracteresVisiblesFinal, texto.length()));
+  fill(248, 246, 240);
+  textFont(fuenteConecta);
+  textSize(30);
+  textAlign(CENTER, CENTER);
+  text(visible, cajaX + 52, cajaY + 115, cajaW - 104, cajaH - 180);
+
+  stroke(255, 255, 255, 35);
+  strokeWeight(1);
+  line(cajaX + 52, cajaY + cajaH - 52, cajaX + cajaW - 52, cajaY + cajaH - 52);
+
+  noStroke();
+  fill(210);
+  textFont(fuenteCuerpo);
+  textSize(13);
+  text(
+    slideFinal == 1 ? "Slide 1 / 2" : "Slide 2 / 2  —  Presiona X / Enter para volver a jugar",
+    width / 2,
+    cajaY + cajaH - 26
+  );
+
+  dibujarIndicadorIntro();
 }

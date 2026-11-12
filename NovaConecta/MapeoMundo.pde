@@ -524,20 +524,24 @@ void dibujarFuente(float x, float yb) {
 }
 
 void dibujarPersona(float x, float y, int v) {
-  fill(110, 110, 100);
+  dibujarPersona(x, y, v, 255);
+}
+
+void dibujarPersona(float x, float y, int v, float opacidad) {
+  fill(110, 110, 100, opacidad);
   ellipse(x, y + 35, 30, 10);
 
-  fill(50);
+  fill(50, opacidad);
   rect(x - 8, y + 18, 6, 18);
   rect(x + 3, y + 18, 6, 18);
 
-  if (v == 0) fill(80, 120, 190);
-  else if (v == 1) fill(200, 90, 90);
-  else if (v == 2) fill(90, 170, 110);
-  else fill(220, 170, 70);
+  if (v == 0) fill(80, 120, 190, opacidad);
+  else if (v == 1) fill(200, 90, 90, opacidad);
+  else if (v == 2) fill(90, 170, 110, opacidad);
+  else fill(220, 170, 70, opacidad);
   rect(x - 12, y - 5, 24, 25);
 
-  fill(230, 180, 140);
+  fill(230, 180, 140, opacidad);
   ellipse(x, y - 15, 22, 22);
 }
 
@@ -876,4 +880,29 @@ void fondoPlaza() {
     else fill(80, 120, 210);
     triangle(x, 55, x + 20, 55, x + 10, 75);
   }
+}
+
+void dibujarNpcLaura() {
+  pushStyle();
+
+  noStroke();
+  fill(0, 50);
+  ellipse(npcLauraX, npcLauraY + 34, 32, 10);
+
+  fill(40);
+  rect(npcLauraX - 8, npcLauraY + 15, 6, 20);
+  rect(npcLauraX + 2, npcLauraY + 15, 6, 20);
+
+  fill(80, 130, 200);
+  rect(npcLauraX - 13, npcLauraY - 8, 26, 25, 4);
+
+  fill(230, 180, 140);
+  ellipse(npcLauraX, npcLauraY - 18, 22, 22);
+
+  fill(255, 230, 70);
+  textAlign(CENTER);
+  textSize(20);
+  text("L", npcLauraX, npcLauraY - 42);
+
+  popStyle();
 }

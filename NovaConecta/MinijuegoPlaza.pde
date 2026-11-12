@@ -21,42 +21,49 @@ boolean mousePlazaAntes = false;
 // Progreso del minijuego
 int aciertosPlaza = 0;
 int desaciertosPlaza = 0;
+int vidasPlaza = 3;
+boolean impactoRojoPlaza = false;
+int tiempoImpactoPlaza = 0;
+boolean derrotaPlaza = false;
+
 float reticulaX = 0;
 float reticulaY = 0;
 int perfilSeleccionadoPlaza = -1;
 int perfilesResueltosPlaza = 0;
 int botsDesmanteladosPlaza = 0;
 boolean tarjetaMetadatosPlaza = false;
-float[] perfilesXPlaza = {210, 430, 680, 900, 1080};
-float[] perfilesYPlaza = {245, 390, 235, 410, 290};
+
+float[] perfilesXPlaza = {230, 420, 610, 800, 990, 1150, 520};
+float[] perfilesYPlaza = {235, 380, 250, 405, 240, 390, 315};
+float[] velXPlaza = {2.8, -3.1, 3.3, -2.9, 3.2, -3.4, 3.0};
+float[] velYPlaza = {2.1, -2.3, -2.0, 2.4, 2.2, -2.1, 2.3};
+
 String[] perfilesSospechososPlaza = {
   "@voz_vecinal",
   "@alerta_nova",
-  "@cambio_real",
+  "@registraduria_nova",
   "@bot_nova_500",
-  "@foro_abierto"
+  "@foro_abierto",
+  "@prensa_verificada",
+  "@cambio_real"
 };
-boolean[] perfilesBotPlaza = {
-  false,
-  true,
-  false,
-  true,
-  true
+
+// 0 = Ciudadano Real | 1 = Bot | 2 = Cuenta Oficial Protegida ("Bomba")
+int[] tipoPerfilPlaza = {
+  0, 1, 2, 1, 1, 2, 0
 };
+
 String[] metadatosPerfilesPlaza = {
   "Antigüedad: 4 años | Patrón: conversaciones variadas",
   "Antigüedad: 1 hora | Patrón: 500 mensajes idénticos",
-  "Antigüedad: 2 años | Patrón: responde con experiencias propias",
+  "CUENTA OFICIAL | Sello institucional verificado",
   "Antigüedad: 3 minutos | Patrón: publica cada 10 segundos",
-  "Antigüedad: 8 minutos | Patrón: repite etiquetas coordinadas"
+  "Antigüedad: 8 minutos | Patrón: repite etiquetas coordinadas",
+  "CUENTA OFICIAL | Medio acreditado del debate",
+  "Antigüedad: 2 años | Patrón: responde con experiencias propias"
 };
-boolean[] perfilesRevisadosPlaza = {
-  false,
-  false,
-  false,
-  false,
-  false
-};
+
+boolean[] perfilesRevisadosPlaza = new boolean[7];
 
 // =====================================================
 // LÓGICA DEL MINIJUEGO PLAZA
@@ -65,6 +72,11 @@ boolean[] perfilesRevisadosPlaza = {
 void iniciarMinijuegoPlaza() {
   aciertosPlaza = 0;
   desaciertosPlaza = 0;
+  vidasPlaza = 3;
+  impactoRojoPlaza = false;
+  tiempoImpactoPlaza = 0;
+  derrotaPlaza = false;
+
   minijuegoPlazaActivo = true;
   minijuegoPlazaTerminado = false;
   l1PlazaAntes = false;
@@ -75,8 +87,8 @@ void iniciarMinijuegoPlaza() {
   perfilesResueltosPlaza = 0;
   botsDesmanteladosPlaza = 0;
   tarjetaMetadatosPlaza = false;
-  reticulaX = width / 2;
-  reticulaY = height / 2;
+  reticulaX = width / 2.0;
+  reticulaY = height / 2.0;
 
   for (int i = 0; i < perfilesRevisadosPlaza.length; i++) {
     perfilesRevisadosPlaza[i] = false;
@@ -145,24 +157,12 @@ void dibujarDialogoLaura() {
 
   fill(0, 210);
   noStroke();
-  rect(
-    80,
-    250,
-    width - 160,
-    125,
-    12
-  );
+  rect(80, 250, width - 160, 125, 12);
 
   noFill();
   stroke(255);
   strokeWeight(2);
-  rect(
-    80,
-    250,
-    width - 160,
-    125,
-    12
-  );
+  rect(80, 250, width - 160, 125, 12);
 
   noStroke();
   fill(255, 210, 60);
@@ -183,19 +183,19 @@ void dibujarDialogoLaura() {
     );
   } else if (dialogoLaura == 1) {
     text(
-      "En este debate circulan comentarios reales y mensajes de bots.",
+      "El flujo de mensajes en el debate está fuera de control: hay bots, ciudadanos y cuentas oficiales.",
       100,
       300
     );
   } else if (dialogoLaura == 2) {
     text(
-      "Rastrea los perfiles, inspecciona sus metadatos y detecta patrones.",
+      "Escanea rápido con X. ¡Cuidado con censurar cuentas oficiales o ciudadanos reales!",
       100,
       300
     );
   } else if (dialogoLaura == 3) {
     text(
-      "Presiona X para escanear; usa R1 para desmantelar bots o L1 para confirmar ciudadanos.",
+      "Si cometes 3 errores de moderación perderás credibilidad. Usa R1 (Bot) o L1 (Real/Oficial).",
       100,
       300
     );
@@ -219,24 +219,45 @@ void actualizarMinijuegoPlaza() {
     return;
   }
 
-  float velocidadReticula = 4;
+  // Mover los nodos rápidamente dentro del área del escáner
+  if (!tarjetaMetadatosPlaza) {
+    for (int i = 0; i < perfilesSospechososPlaza.length; i++) {
+      if (perfilesRevisadosPlaza[i]) continue;
+      perfilesXPlaza[i] += velXPlaza[i];
+      perfilesYPlaza[i] += velYPlaza[i];
+
+      if (perfilesXPlaza[i] < 185 || perfilesXPlaza[i] > width - 185) {
+        velXPlaza[i] *= -1;
+      }
+      if (perfilesYPlaza[i] < 220 || perfilesYPlaza[i] > 455) {
+        velYPlaza[i] *= -1;
+      }
+    }
+  }
+
+  float velocidadReticula = 6;
   if (moverArriba) reticulaY -= velocidadReticula;
   if (moverAbajo) reticulaY += velocidadReticula;
   if (moverIzquierda) reticulaX -= velocidadReticula;
   if (moverDerecha) reticulaX += velocidadReticula;
 
   if (mandoConectado) {
-    reticulaX += joystickX.getValue() * 6;
-    reticulaY += joystickY.getValue() * 6;
+    float jx = joystickX.getValue();
+    float jy = joystickY.getValue();
+    if (abs(jx) < 0.15) jx = 0;
+    if (abs(jy) < 0.15) jy = 0;
+
+    reticulaX += jx * 8;
+    reticulaY += jy * 8;
   }
 
-  if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
-    reticulaX = lerp(reticulaX, mouseX, 0.18);
-    reticulaY = lerp(reticulaY, mouseY, 0.18);
+  if (mouseX != pmouseX || mouseY != pmouseY) {
+    reticulaX = mouseX;
+    reticulaY = mouseY;
   }
 
-  reticulaX = constrain(reticulaX, 145, width - 145);
-  reticulaY = constrain(reticulaY, 180, height - 90);
+  reticulaX = constrain(reticulaX, 155, width - 155);
+  reticulaY = constrain(reticulaY, 205, 485);
 
   boolean xAhora = mandoConectado && botonX.pressed();
   boolean l1Ahora = mandoConectado && botonL1.pressed();
@@ -273,16 +294,14 @@ void actualizarMinijuegoPlaza() {
 
 int obtenerPerfilBajoReticula() {
   int perfilCercano = -1;
-  float distanciaCercana = 55;
+  float distanciaCercana = 52;
 
   for (int i = 0; i < perfilesSospechososPlaza.length; i++) {
     if (perfilesRevisadosPlaza[i]) {
       continue;
     }
 
-    float perfilX = perfilesXPlaza[i] + sin(frameCount * 0.018 + i) * 18;
-    float perfilY = perfilesYPlaza[i] + cos(frameCount * 0.015 + i) * 12;
-    float distancia = dist(reticulaX, reticulaY, perfilX, perfilY);
+    float distancia = dist(reticulaX, reticulaY, perfilesXPlaza[i], perfilesYPlaza[i]);
 
     if (distancia < distanciaCercana) {
       distanciaCercana = distancia;
@@ -298,14 +317,26 @@ void resolverPerfilPlaza(boolean desmantelarBot) {
     return;
   }
 
-  boolean respuestaCorrecta = desmantelarBot == perfilesBotPlaza[perfilSeleccionadoPlaza];
-  if (respuestaCorrecta) {
+  int tipo = tipoPerfilPlaza[perfilSeleccionadoPlaza];
+  boolean esBot = (tipo == 1);
+  boolean esOficial = (tipo == 2);
+
+  if (desmantelarBot && esOficial) {
+    // Error crítico: censuraste una fuente oficial verificada ("bomba")
+    desaciertosPlaza++;
+    vidasPlaza = max(0, vidasPlaza - 2);
+    impactoRojoPlaza = true;
+    tiempoImpactoPlaza = millis();
+  } else if (desmantelarBot == esBot) {
     aciertosPlaza++;
-    if (desmantelarBot) {
+    if (esBot) {
       botsDesmanteladosPlaza++;
     }
   } else {
     desaciertosPlaza++;
+    vidasPlaza = max(0, vidasPlaza - 1);
+    impactoRojoPlaza = true;
+    tiempoImpactoPlaza = millis();
   }
 
   perfilesRevisadosPlaza[perfilSeleccionadoPlaza] = true;
@@ -313,7 +344,18 @@ void resolverPerfilPlaza(boolean desmantelarBot) {
   tarjetaMetadatosPlaza = false;
   perfilSeleccionadoPlaza = -1;
 
+  // Verificar derrota inmediata
+  if (vidasPlaza <= 0) {
+    derrotaPlaza = true;
+    minijuegoPlazaActivo = false;
+    minijuegoPlazaTerminado = true;
+    aplicarResultadoPlaza();
+    return;
+  }
+
+  // Verificar victoria al analizar todos
   if (perfilesResueltosPlaza >= perfilesSospechososPlaza.length) {
+    derrotaPlaza = false;
     minijuegoPlazaActivo = false;
     minijuegoPlazaTerminado = true;
     aplicarResultadoPlaza();
@@ -328,53 +370,70 @@ void dibujarMinijuegoPlaza() {
   pushStyle();
 
   noStroke();
-  fill(0, 220);
-  rect(
-    120,
-    120,
-    width - 240,
-    420,
-    14
-  );
+  fill(45, 52, 54, 235);
+  rect(120, 115, width - 240, 440, 16);
+  stroke(108, 92, 231);
+  strokeWeight(2);
+  noFill();
+  rect(120, 115, width - 240, 440, 16);
+  noStroke();
 
   fill(248, 246, 240);
   textFont(fuenteTitulo);
   textAlign(CENTER, TOP);
   textSize(22);
-  text(
-    "ESCÁNER DE BOTS - PLAZA NOVA",
-    width / 2,
-    145
-  );
+  text("ESCÁNER DE BOTS - PLAZA NOVA", width / 2, 136);
 
-  fill(190);
+  fill(196, 180, 225);
   textFont(fuenteCuerpo);
   textSize(13);
   text(
-    "Rastrea perfiles sospechosos y verifica su identidad digital",
+    "Desmantela los bots (R1) y protege ciudadanos o cuentas oficiales (L1)",
     width / 2,
-    180
+    168
   );
+
+  // Indicador de Credibilidad (Vidas)
+  textFont(fuenteTitulo);
+  textAlign(RIGHT, TOP);
+  textSize(16);
+  if (vidasPlaza == 1) {
+    fill(232, 111, 105, max(90, sin(frameCount * 0.3) * 255));
+  } else {
+    fill(87, 176, 116);
+  }
+  text("CREDIBILIDAD: " + vidasPlaza + "/3", width - 150, 140);
 
   for (int i = 0; i < perfilesSospechososPlaza.length; i++) {
     if (perfilesRevisadosPlaza[i]) {
       continue;
     }
 
-    float perfilX = perfilesXPlaza[i] + sin(frameCount * 0.018 + i) * 18;
-    float perfilY = perfilesYPlaza[i] + cos(frameCount * 0.015 + i) * 12;
+    float perfilX = perfilesXPlaza[i];
+    float perfilY = perfilesYPlaza[i];
+    int tipo = tipoPerfilPlaza[i];
 
-    fill(108, 92, 231, 90);
-    ellipse(perfilX, perfilY, 56, 56);
+    // Las cuentas oficiales tienen halo dorado distintivo
+    if (tipo == 2) {
+      fill(245, 190, 40, 95);
+    } else {
+      fill(108, 92, 231, 90);
+    }
+    ellipse(perfilX, perfilY, 54, 54);
+
     fill(248, 246, 240);
-    ellipse(perfilX, perfilY, 42, 42);
+    ellipse(perfilX, perfilY, 40, 40);
+
     fill(45, 52, 54);
-    textFont(fuenteCuerpo);
+    textFont(fuenteTitulo);
     textAlign(CENTER, CENTER);
     textSize(12);
     text(perfilesSospechososPlaza[i].substring(1, 2).toUpperCase(), perfilX, perfilY);
+
+    fill(240);
+    textFont(fuenteCuerpo);
     textSize(10);
-    text(perfilesSospechososPlaza[i], perfilX, perfilY + 40);
+    text(perfilesSospechososPlaza[i], perfilX, perfilY + 36);
   }
 
   stroke(108, 220, 231);
@@ -391,95 +450,72 @@ void dibujarMinijuegoPlaza() {
   textFont(fuenteCuerpo);
   textAlign(LEFT, BOTTOM);
   textSize(12);
-  text("X / Clic: escanear   |   R1: desmantelar bot   |   L1: confirmar ciudadano", 150, 515);
-  text("Bots desmantelados: " + botsDesmanteladosPlaza + "   Perfiles analizados: " + perfilesResueltosPlaza + "/5", 150, 535);
+  text("X / Clic: escanear   |   R1: desmantelar bot   |   L1: confirmar real / oficial", 150, 522);
+  text(
+    "Bots desmantelados: " + botsDesmanteladosPlaza + "/3   |   Perfiles analizados: " + perfilesResueltosPlaza + "/7",
+    150,
+    542
+  );
 
   if (tarjetaMetadatosPlaza && perfilSeleccionadoPlaza != -1) {
     dibujarTarjetaMetadatosPlaza();
+  }
+
+  // Destello rojo si cometiste un error
+  if (impactoRojoPlaza) {
+    if (millis() - tiempoImpactoPlaza < 220) {
+      fill(232, 111, 105, 85);
+      rect(120, 115, width - 240, 440, 16);
+    } else {
+      impactoRojoPlaza = false;
+    }
   }
 
   popStyle();
 }
 
 void dibujarTarjetaMetadatosPlaza() {
-  float tarjetaX = width / 2 - 220;
+  float tarjetaX = width / 2 - 230;
   float tarjetaY = 205;
+  int tipo = tipoPerfilPlaza[perfilSeleccionadoPlaza];
 
-  fill(45, 52, 54, 235);
-  stroke(108, 220, 231);
+  fill(45, 52, 54, 242);
+  stroke(tipo == 2 ? color(245, 190, 40) : color(108, 220, 231));
   strokeWeight(2);
-  rect(tarjetaX, tarjetaY, 440, 150, 14);
+  rect(tarjetaX, tarjetaY, 460, 155, 14);
 
-  fill(108, 220, 231);
+  fill(tipo == 2 ? color(245, 190, 40) : color(108, 220, 231));
   textFont(fuenteTitulo);
   textAlign(LEFT, TOP);
   textSize(18);
-  text("PERFIL ESCANEADO", tarjetaX + 22, tarjetaY + 18);
+  text(tipo == 2 ? "FUENTE INSTITUCIONAL DETECTADA" : "PERFIL ESCANEADO", tarjetaX + 22, tarjetaY + 18);
 
   fill(248, 246, 240);
   textFont(fuenteCuerpo);
   textSize(15);
   text(perfilesSospechososPlaza[perfilSeleccionadoPlaza], tarjetaX + 22, tarjetaY + 50);
+
   fill(210);
   textSize(13);
-  text(metadatosPerfilesPlaza[perfilSeleccionadoPlaza], tarjetaX + 22, tarjetaY + 78, 396, 40);
+  text(metadatosPerfilesPlaza[perfilSeleccionadoPlaza], tarjetaX + 22, tarjetaY + 78, 416, 40);
+
   fill(255);
   textSize(12);
-  text("R1  Desmantelar Bot        L1  Confirmar Ciudadano Real", tarjetaX + 22, tarjetaY + 124);
+  text("R1  Desmantelar Bot        L1  Confirmar Real / Oficial", tarjetaX + 22, tarjetaY + 126);
 }
 
 void aplicarResultadoPlaza() {
-  if (botsDesmanteladosPlaza >= 3) {
-    cambiarIndicadores(
-      +15,
-      +10,
-      +10,
-      +15,
-      +15
-    );
-    println("RESULTADO PLAZA: EXCELENTE");
-  } else if (botsDesmanteladosPlaza >= 2) {
-    cambiarIndicadores(
-      +5,
-      +5,
-      +5,
-      +5,
-      +5
-    );
-    println("RESULTADO PLAZA: REGULAR");
+  if (derrotaPlaza || vidasPlaza <= 0) {
+    cambiarIndicadores(-15, -15, -10, -10, -25);
+  } else if (botsDesmanteladosPlaza >= 3 && vidasPlaza >= 2) {
+    cambiarIndicadores(+15, +15, +10, +15, +20);
   } else {
-    cambiarIndicadores(
-      -10,
-      -5,
-      -5,
-      -10,
-      -15
-    );
-    println("RESULTADO PLAZA: MALO - Bots desmantelados: " + botsDesmanteladosPlaza);
+    cambiarIndicadores(+5, +5, +5, +5, +5);
   }
-}
 
-void dibujarNpcLaura() {
-  pushStyle();
-
-  noStroke();
-  fill(0, 50);
-  ellipse(npcLauraX, npcLauraY + 34, 32, 10);
-
-  fill(40);
-  rect(npcLauraX - 8, npcLauraY + 15, 6, 20);
-  rect(npcLauraX + 2, npcLauraY + 15, 6, 20);
-
-  fill(80, 130, 200);
-  rect(npcLauraX - 13, npcLauraY - 8, 26, 25, 4);
-
-  fill(230, 180, 140);
-  ellipse(npcLauraX, npcLauraY - 18, 22, 22);
-
-  fill(255, 230, 70);
-  textAlign(CENTER);
-  textSize(20);
-  text("L", npcLauraX, npcLauraY - 42);
-
-  popStyle();
+  slideFinal = 1;
+  caracteresVisiblesFinal = 0;
+  tiempoInicioFinal = millis();
+  ultimoTipeadoFinal = tiempoInicioFinal;
+  estadoJuego = ESTADO_FINAL;
 }

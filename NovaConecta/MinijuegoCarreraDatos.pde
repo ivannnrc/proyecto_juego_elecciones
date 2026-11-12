@@ -594,21 +594,21 @@ void dibujarImpactoRojoCarrera() {
 }
 
 void finalizarMinijuego1() {
-  if (vidasCarrera <= 0 || datosCorrectos < 4) {
-    finalizarMinijuego1ConDerrota();
-    return;
-  }
-
   if (vidasCarrera >= 2 && datosCorrectos >= 7) {
-    resultadoCarrera = 1;
-    cambiarIndicadores(15, 10, 5, 10, 15);
+    resultadoCarrera = 1; // Verificador Digital
+    cambiarIndicadores(+15, +10, +5, +10, +15);
   } else {
-    resultadoCarrera = 2;
-    cambiarIndicadores(5, -5, 0, 0, -5);
+    resultadoCarrera = 2; // Observador Pasivo (sobreviviste con 1 vida o pocos datos)
+    cambiarIndicadores(+5, -5, 0, 0, -5);
   }
 
-  regresarAlColegioDesdeCarrera();
-}
+  minijuego1Activo = false;
+  slideOutroMJ1 = 1;
+  caracteresVisiblesOutro = 0;
+  tiempoInicioOutroMJ1 = millis();
+  ultimoTipeadoOutro = tiempoInicioOutroMJ1;
+  estadoJuego = ESTADO_OUTRO_MJ1;
+} 
 
 void finalizarMinijuego1ConDerrota() {
   if (!minijuego1Activo) {
@@ -618,6 +618,13 @@ void finalizarMinijuego1ConDerrota() {
   resultadoCarrera = 3;
   cambiarIndicadores(-15, -10, -5, 5, -20);
   regresarAlColegioDesdeCarrera();
+  resultadoCarrera = 3;
+  minijuego1Activo = false;
+  slideOutroMJ1 = 1;
+  caracteresVisiblesOutro = 0;
+  tiempoInicioOutroMJ1 = millis();
+  ultimoTipeadoOutro = tiempoInicioOutroMJ1;
+  estadoJuego = ESTADO_OUTRO_MJ1;
 }
 
 void regresarAlColegioDesdeCarrera() {

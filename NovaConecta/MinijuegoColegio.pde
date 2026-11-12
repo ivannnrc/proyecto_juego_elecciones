@@ -29,6 +29,16 @@ boolean[] crisisColegioResuelta = {
 
 // Cantidad de crisis resueltas
 int crisisColegioCompletadas = 0;
+boolean[] multitudDispersandoseColegio = {
+  false,
+  false,
+  false
+};
+int[] tiempoDispersandoMultitudColegio = {
+  0,
+  0,
+  0
+};
 
 // =====================================================
 // PUNTOS DE ACOPIO DEL COLEGIO
@@ -109,66 +119,105 @@ int[] puntoPublicacionColegio = {
 // =====================================================
 
 void dibujarPuntosAcopioColegio() {
-
   if (escenario != 2) {
     return;
   }
 
-  // Si no hay una publicación seleccionada,
-  // no mostramos ningún punto
-  if (puntoAcopioActual == -1) {
-    return;
-  }
-
-  float x = puntosAcopioColegio[puntoAcopioActual][0];
-  float y = puntosAcopioColegio[puntoAcopioActual][1];
-
   pushStyle();
 
-  // CÍRCULO DEL OBJETIVO
-  noFill();
-  stroke(255, 220, 0);
-  strokeWeight(4);
+  for (int punto = 0; punto < multitudDispersandoseColegio.length; punto++) {
+    if (!multitudDispersandoseColegio[punto]) {
+      continue;
+    }
 
-  ellipse(
-    x,
-    y,
-    80,
-    80
-  );
+    int transcurrido = millis() - tiempoDispersandoMultitudColegio[punto];
+    if (transcurrido >= 1000) {
+      multitudDispersandoseColegio[punto] = false;
+      continue;
+    }
 
-  // PUNTO CENTRAL
-  noStroke();
-  fill(255, 220, 0);
+    float progreso = constrain(transcurrido / 1000.0, 0, 1);
+    dibujarMultitudColegio(
+      puntosAcopioColegio[punto][0],
+      puntosAcopioColegio[punto][1],
+      true,
+      progreso
+    );
+  }
 
-  ellipse(
-    x,
-    y,
-    18,
-    18
-  );
+  if (
+    publicacionColegioActual != -1 &&
+    publicacionColegioActual >= 0 &&
+    publicacionColegioActual < puntosAcopioColegio.length &&
+    !publicacionVerificadaColegio[publicacionColegioActual]
+  ) {
+    float x = puntosAcopioColegio[publicacionColegioActual][0];
+    float y = puntosAcopioColegio[publicacionColegioActual][1];
+    dibujarMultitudColegio(x, y, false, 0);
 
-  // NOMBRE DEL LUGAR
-  fill(0, 190);
+    if (puntoAcopioActual >= 0 && puntoAcopioActual < nombresPuntosColegio.length) {
+      noFill();
+      stroke(255, 220, 0);
+      strokeWeight(4);
+      ellipse(x, y, 80, 80);
 
-  rect(
-    x - 100,
-    y - 70,
-    200,
-    35,
-    8
-  );
+      noStroke();
+      fill(255, 220, 0);
+      ellipse(x, y, 18, 18);
 
-  fill(255);
+      fill(0, 190);
+      rectMode(CORNER);
+      rect(x - 100, y - 70, 200, 35, 8);
 
-  textAlign(CENTER, CENTER);
-  textSize(14);
+      fill(255);
+      textAlign(CENTER, CENTER);
+      textSize(14);
+      text(nombresPuntosColegio[puntoAcopioActual], x, y - 52);
+    }
+  }
 
-  text(
-    nombresPuntosColegio[puntoAcopioActual],
-    x,
-    y - 52
-  );
+  popStyle();
+}
+
+void dibujarMultitudColegio(float x, float y, boolean dispersando, float progreso) {
+  pushStyle();
+  int cantidad = 7;
+  float separacion = 34;
+  float avance = progreso * (width + 500);
+
+  for (int i = 0; i < cantidad; i++) {
+    float lado = i % 2 == 0 ? -1 : 1;
+    float oscilacion = sin(frameCount * 0.1 + i) * 5;
+    float desplazamiento = dispersando ? lado * avance : 0;
+    float npcX = x + (i - (cantidad - 1) / 2.0) * separacion + oscilacion + desplazamiento;
+    float npcY = y + 28 + abs(i - (cantidad - 1) / 2.0) * 5;
+    float opacidad = dispersando ? 255 * (1 - progreso) : 255;
+
+    dibujarPersona(npcX, npcY - 35, i % 4, opacidad);
+  }
+
+  if (!dispersando) {
+    String[] murmullos = {
+      "¡¿Es verdad?!",
+      "¡Miren Conecta!",
+      "¡No puede ser!"
+    };
+    float burbujaX = x + sin(frameCount * 0.035) * 18;
+    float burbujaY = y - 86 + sin(frameCount * 0.1) * 4;
+    textSize(12);
+    textAlign(CENTER, CENTER);
+    fill(60, 50, 40, 35);
+    noStroke();
+    rectMode(CENTER);
+    rect(burbujaX + 2, burbujaY + 3, 150, 28, 12);
+    fill(255, 248);
+    stroke(228, 225, 220);
+    strokeWeight(1);
+    rect(burbujaX, burbujaY, 150, 28, 12);
+    noStroke();
+    fill(45, 52, 54);
+    text(murmullos[(frameCount / 90) % murmullos.length], burbujaX, burbujaY);
+  }
 
   popStyle();
 }
@@ -562,11 +611,18 @@ void dibujarResultadoInvestigacionColegio() {
 
 void procesarDecisionColegio(int opcion) {
 
-  if (publicacionColegioActual == -1) {
+  if (
+    publicacionColegioActual == -1 ||
+    publicacionColegioActual < 0 ||
+    publicacionColegioActual >= puntoPublicacionColegio.length ||
+    opcion < 1 ||
+    opcion > 3
+  ) {
     return;
   }
 
   int i = publicacionColegioActual;
+  int puntoDispersion = puntoPublicacionColegio[i];
 
   // =====================================================
   // 1 = COMPARTIR
@@ -616,6 +672,9 @@ void procesarDecisionColegio(int opcion) {
     );
     activarTipConecta(opcion);
   }
+
+  multitudDispersandoseColegio[puntoDispersion] = true;
+  tiempoDispersandoMultitudColegio[puntoDispersion] = millis();
 
   // =====================================================
   // MARCAR ESTA CRISIS COMO RESUELTA

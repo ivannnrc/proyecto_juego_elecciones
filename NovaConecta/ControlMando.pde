@@ -14,12 +14,13 @@ ControlButton botonX;
 ControlButton botonL1;
 ControlButton botonR1;
 ControlButton botonL2;
-
+ControlButton botonCirculo;
 boolean cuadradoPresionadoAntes = false;
 boolean l1PresionadoAntes = false;
 boolean r1PresionadoAntes = false;
 boolean l2PresionadoAntes = false;
 boolean XpresionadoAntes = false;
+boolean circuloPresionadoAntes = false;
 
 boolean mandoConectado = false;
 

@@ -29,6 +29,11 @@ ArrayList<BloqueDato> bloquesDatos = new ArrayList<BloqueDato>();
 int ultimoBloqueCarrera = 0;
 int ultimoFrameCarrera = 0;
 int tipoBloqueCarrera = 0;
+String textoFlotanteCarrera = "";
+color colorFlotanteCarrera = color(87, 176, 116);
+int tiempoFlotanteCarrera = 0;
+float flotanteCarreraX = 0;
+float flotanteCarreraY = 0;
 boolean joystickIzquierdaCarreraAntes = false;
 boolean joystickDerechaCarreraAntes = false;
 boolean teclaIzquierdaCarreraAntes = false;
@@ -248,8 +253,10 @@ void cambiarCarrilCarrera(int cambio) {
   if (carrilNuevo != carrilJugador) {
     carrilJugador = carrilNuevo;
     ultimoCambioCarril = ahora;
+    
   }
 }
+
 
 void actualizarMinijuego1() {
   if (!minijuego1Activo) {
@@ -344,6 +351,11 @@ void aplicarDanoCarrera() {
   tiempoImpacto = millis();
   ralentizacionAvatarHasta = tiempoImpacto + 400;
   ultimoCambioCarril = tiempoImpacto;
+  textoFlotanteCarrera = "-1 VIDA";
+  colorFlotanteCarrera = color(232, 111, 105);
+  tiempoFlotanteCarrera = millis();
+  flotanteCarreraX = lerp(pistaIzquierdaEnY(height), pistaDerechaEnY(height), (carrilJugador + 0.5) / 3.0);
+  flotanteCarreraY = height - 165;
   if (vidasCarrera <= 0) {
     finalizarMinijuego1ConDerrota();
   }
@@ -366,6 +378,11 @@ void actualizarBloquesCarrera(float deltaSegundos) {
       if (bloque.esConfiable) {
         datosCorrectos++;
         progresoCarrera = min(100, progresoCarrera + 2.5);
+        textoFlotanteCarrera = "+1 VERIFICADO";
+        colorFlotanteCarrera = color(87, 176, 116);
+        tiempoFlotanteCarrera = millis();
+        flotanteCarreraX = lerp(pistaIzquierdaEnY(height), pistaDerechaEnY(height), (carrilJugador + 0.5) / 3.0);
+        flotanteCarreraY = height - 165;
       } else {
         datosIncorrectos++;
         aplicarDanoCarrera();
@@ -387,8 +404,33 @@ void dibujarCarreraDatos() {
   dibujarPistaCarrera();
   dibujarBloquesCarrera();
   dibujarAvatarCarrera();
+  dibujarTextoFlotanteCarrera();
   dibujarHudCarrera();
   dibujarImpactoRojoCarrera();
+}
+
+void dibujarTextoFlotanteCarrera() {
+  int tiempoTranscurrido = millis() - tiempoFlotanteCarrera;
+  if (textoFlotanteCarrera.length() == 0 || tiempoTranscurrido >= 750) {
+    return;
+  }
+
+  pushStyle();
+  fill(
+    red(colorFlotanteCarrera),
+    green(colorFlotanteCarrera),
+    blue(colorFlotanteCarrera),
+    map(tiempoTranscurrido, 0, 750, 255, 0)
+  );
+  textFont(fuenteTitulo);
+  textAlign(CENTER, CENTER);
+  textSize(22);
+  text(
+    textoFlotanteCarrera,
+    flotanteCarreraX,
+    flotanteCarreraY - map(tiempoTranscurrido, 0, 750, 0, 45)
+  );
+  popStyle();
 }
 
 void dibujarPistaCarrera() {

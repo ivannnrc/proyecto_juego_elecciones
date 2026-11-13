@@ -205,6 +205,24 @@ void dibujarBus() {
     busY + 15
   );
 
+  if (busDetenido && minijuegoIncendiosTerminado) {
+    float bob = sin(frameCount * 0.12) * 4;
+    String textoGlobo = cercaDelBus
+      ? "Presiona [X] para subir"
+      : "Bus al Colegio listo";
+    float globoY = busY - 68 + bob;
+
+    rectMode(CENTER);
+    fill(45, 52, 54, 235);
+    stroke(255, 230, 120);
+    strokeWeight(2);
+    rect(busX, globoY, textWidth(textoGlobo) + 24, 30, 15);
+    noStroke();
+    fill(255);
+    textAlign(CENTER, CENTER);
+    text(textoGlobo, busX, globoY);
+  }
+
   rectMode(CORNER);
 
   popStyle();
@@ -461,6 +479,24 @@ void dibujarBusPlaza() {
     busPlazaX,
     busPlazaY + 15
   );
+
+  if (busPlazaDetenido && crisisColegioCompletadas >= 3) {
+    float bob = sin(frameCount * 0.12) * 4;
+    String textoGlobo = cercaBusPlaza
+      ? "Presiona [X] para subir"
+      : "Bus a Plaza Nova listo";
+    float globoY = busPlazaY - 68 + bob;
+
+    rectMode(CENTER);
+    fill(45, 52, 54, 235);
+    stroke(255, 230, 120);
+    strokeWeight(2);
+    rect(busPlazaX, globoY, textWidth(textoGlobo) + 24, 30, 15);
+    noStroke();
+    fill(255);
+    textAlign(CENTER, CENTER);
+    text(textoGlobo, busPlazaX, globoY);
+  }
 
   rectMode(CORNER);
 

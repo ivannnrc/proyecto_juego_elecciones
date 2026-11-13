@@ -519,3 +519,175 @@ void aplicarResultadoPlaza() {
   ultimoTipeadoFinal = tiempoInicioFinal;
   estadoJuego = ESTADO_FINAL;
 }
+void dibujarPantallaTendenciasAlcaldia() {
+
+  if (escenario != 3) {
+    return;
+  }
+
+  if (!minijuegoPlazaTerminado) {
+    return;
+  }
+
+  pushStyle();
+
+  // MÁS PEQUEÑA Y MÁS ARRIBA A LA DERECHA
+  float ancho = 390;
+float alto = 245;
+
+float x = width - ancho - 25;
+float y = 120;
+  // Fondo
+  fill(20, 25, 32, 235);
+  stroke(108, 220, 231);
+  strokeWeight(3);
+
+  rect(
+    x,
+    y,
+    ancho,
+    alto,
+    14
+  );
+
+  // Encabezado
+  fill(108, 92, 231);
+  noStroke();
+
+  rect(
+    x,
+    y,
+    ancho,
+    45,
+    14,
+    14,
+    0,
+    0
+  );
+
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textFont(fuenteTitulo);
+  textSize(16);
+
+  text(
+    "CONECTA • TENDENCIAS",
+    x + ancho/2,
+    y + 22
+  );
+
+  // Cuerpo
+  textAlign(LEFT, CENTER);
+  textFont(fuenteCuerpo);
+
+  // =====================================================
+  // BUEN RESULTADO
+  // =====================================================
+
+  if (
+    !derrotaPlaza &&
+    botsDesmanteladosPlaza >= 3 &&
+    vidasPlaza >= 2
+  ) {
+
+    fill(80, 210, 120);
+    textSize(17);
+
+    text(
+      "✓ Conversación estabilizada",
+      x + 20,
+      y + 72
+    );
+
+    fill(240);
+    textSize(14);
+
+    text("#FraudeEnNova: 2.1K  ↓", x + 20, y + 108);
+    text("Fuentes confiables: suben", x + 20, y + 138);
+    text("Cuentas automatizadas: bajan", x + 20, y + 168);
+
+  fill(185);
+textSize(11);
+
+text(
+  "Las cuentas automatizadas dejaron de dominar la conversación pública.",
+  x + 20,
+  y + 185,
+  ancho - 40,
+  45
+);
+  }
+
+  // =====================================================
+  // RESULTADO INTERMEDIO
+  // =====================================================
+
+  else if (
+    !derrotaPlaza &&
+    botsDesmanteladosPlaza >= 1
+  ) {
+
+    fill(240, 190, 70);
+    textSize(17);
+
+    text(
+      "⚠ Conversación dividida",
+      x + 20,
+      y + 72
+    );
+
+    fill(240);
+    textSize(14);
+
+    text("#FraudeEnNova: 5.6K", x + 20, y + 108);
+    text("Fuentes confiables: se mantienen", x + 20, y + 138);
+    text("Cuentas automatizadas: continúan", x + 20, y + 168);
+
+  fill(185);
+textSize(11);
+
+text(
+  "Parte de la conversación sigue siendo amplificada por cuentas sospechosas.",
+  x + 20,
+  y + 185,
+  ancho - 40,
+  45
+);
+  }
+
+  // =====================================================
+  // MAL RESULTADO
+  // =====================================================
+
+  else {
+
+    fill(235, 90, 90);
+    textSize(17);
+
+    text(
+      "⚠ Tendencia manipulada",
+      x + 20,
+      y + 72
+    );
+
+    fill(240);
+    textSize(14);
+
+    text("#FraudeEnNova: 9.8K  ↑", x + 20, y + 108);
+    text("Fuentes confiables: bajan", x + 20, y + 138);
+    text("Cuentas automatizadas: aumentan", x + 20, y + 168);
+
+    fill(185);
+    textSize(12);
+
+    text(
+      "La conversación pública está siendo amplificada artificialmente por bots.",
+      x + 20,
+      y + 185,
+      ancho - 40,
+      45
+    );
+  }
+
+  popStyle();
+}

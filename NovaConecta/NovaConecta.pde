@@ -108,12 +108,13 @@ void setup() {
 
     // BOTONES DEL CONTROL
     botonTriangulo = mando.getButton(4);
-    botonCuadrado = mando.getButton(1);
-    botonX = mando.getButton(2);
+botonCuadrado = mando.getButton(1);
+botonX = mando.getButton(2);
+botonCirculo = mando.getButton(3);
 
-    botonL1 = mando.getButton(5);
-    botonR1 = mando.getButton(6);
-    botonL2 = mando.getButton(7);
+botonL1 = mando.getButton(5);
+botonR1 = mando.getButton(6);
+botonL2 = mando.getButton(7);
 
     mandoConectado = true;
   } else {
@@ -173,6 +174,9 @@ void draw() {
 
   // 1. LEER BOTONES DEL CONTROL PARA CONECTA
   actualizarControlRedSocial();
+  actualizarViralidadConecta();
+  actualizarConversacionesBarrio();
+  actualizarVecinosRumor();
   revisarInteraccionNpcBombero();
   controlarDialogoBombero();
   revisarInteraccionNpcLaura();
@@ -204,6 +208,7 @@ void draw() {
 
   // 4. DIBUJAR ESCENARIO
   dibujarMundo();
+  dibujarPantallaTendenciasAlcaldia();
 
   // 5. HUD E INDICADORES
 
@@ -268,7 +273,9 @@ void dibujarIntroSlides() {
   } else {
     dibujarTarjetaIntro(slideActual, caracteresVisibles);
   }
+  if (slideFinal == 1) {
   dibujarIndicadorIntro();
+}
 }
 
 void actualizarTextoIntro() {
@@ -524,6 +531,7 @@ void keyPressed() {
   if (estadoJuego == ESTADO_FINAL) {
     if (key == ENTER || key == RETURN || key == ' ') {
       avanzarSlideFinal();
+      
     } else if (key == 'r' || key == 'R') {
       reiniciarJuegoCompleto();
     }
@@ -832,33 +840,103 @@ int calcularRangoFinal() {
 }
 
 void actualizarControlFinal() {
-  if (!mandoConectado || botonX == null) {
+
+  if (!mandoConectado) {
     XpresionadoAntes = false;
+    circuloPresionadoAntes = false;
     return;
   }
-  boolean xAhora = botonX.pressed();
-  if (xAhora && !XpresionadoAntes) {
-    avanzarSlideFinal();
+
+  boolean xAhora =
+    botonX != null &&
+    botonX.pressed();
+
+  boolean circuloAhora =
+    botonCirculo != null &&
+    botonCirculo.pressed();
+
+
+  // =====================================================
+  // SLIDE 1 = X PARA CONTINUAR
+  // =====================================================
+
+  if (slideFinal == 1) {
+
+    if (
+      xAhora &&
+      !XpresionadoAntes
+    ) {
+      avanzarSlideFinal();
+    }
   }
+
+
+  // =====================================================
+  // SLIDE 2 = CÍRCULO PARA SEGUIR EXPLORANDO
+  // =====================================================
+
+  else if (slideFinal == 2) {
+
+    if (
+      circuloAhora &&
+      !circuloPresionadoAntes
+    ) {
+      continuarExplorandoNova();
+    }
+  }
+
   XpresionadoAntes = xAhora;
+  circuloPresionadoAntes = circuloAhora;
 }
 
 void avanzarSlideFinal() {
-  String textoActual = obtenerTextoFinal(slideFinal);
-  if (caracteresVisiblesFinal < textoActual.length()) {
-    caracteresVisiblesFinal = textoActual.length();
+
+  String textoActual =
+    obtenerTextoFinal(slideFinal);
+
+  // Si el texto todavía se está escribiendo,
+  // X lo muestra completo primero.
+  if (
+    caracteresVisiblesFinal <
+    textoActual.length()
+  ) {
+
+    caracteresVisiblesFinal =
+      textoActual.length();
+
     ultimoTipeadoFinal = millis();
+
     return;
   }
 
+
+  // SOLO PASAR DEL SLIDE 1 AL SLIDE 2
   if (slideFinal == 1) {
+
     slideFinal = 2;
+
     tiempoInicioFinal = millis();
-    ultimoTipeadoFinal = tiempoInicioFinal;
+
+    ultimoTipeadoFinal =
+      tiempoInicioFinal;
+
     caracteresVisiblesFinal = 0;
-  } else {
-    reiniciarJuegoCompleto();
   }
+}
+void continuarExplorandoNova() {
+
+  estadoJuego = ESTADO_JUEGO;
+
+  cargarEscenario(3);
+
+  jugadorX = 1100;
+  jugadorY = 700;
+
+  actualizarCamara();
+
+  circuloPresionadoAntes = true;
+
+  println("EXPLORACIÓN LIBRE ACTIVADA");
 }
 
 void reiniciarJuegoCompleto() {
@@ -967,10 +1045,12 @@ void dibujarPantallaFinal() {
   textFont(fuenteCuerpo);
   textSize(13);
   text(
-    slideFinal == 1 ? "Slide 1 / 2" : "Slide 2 / 2  —  Presiona X / Enter para volver a jugar",
-    width / 2,
-    cajaY + cajaH - 26
-  );
+  slideFinal == 1
+    ? "Slide 1 / 2  —  Presiona X para continuar"
+    : "○  Presiona CÍRCULO para seguir investigando Nova",
+  width / 2,
+  cajaY + cajaH - 26
+);
 
   dibujarIndicadorIntro();
 }

@@ -44,6 +44,7 @@ void dibujarMundo() {
     dibujarBus();
     dibujarNpcBombero();
     dibujarIncendios();
+    dibujarImpactoRedesMundo();
 
   } else if (escenario == 2) {
 
@@ -55,6 +56,7 @@ void dibujarMundo() {
 
     fondoPlaza();
     dibujarNpcLaura();
+    
   }
 
   popStyle();
@@ -899,10 +901,19 @@ void dibujarNpcLaura() {
   fill(230, 180, 140);
   ellipse(npcLauraX, npcLauraY - 18, 22, 22);
 
-  fill(255, 230, 70);
   textAlign(CENTER);
-  textSize(20);
-  text("L", npcLauraX, npcLauraY - 42);
+  if (crisisColegioCompletadas >= 3 && !minijuegoPlazaTerminado) {
+    float bob = sin(frameCount * 0.14) * 4;
+    fill(255, 205, 55);
+    textFont(fuenteTitulo);
+    textSize(36);
+    text("!", npcLauraX, npcLauraY - 42 + bob);
+  } else {
+    fill(190, 230, 255);
+    textFont(fuenteTitulo);
+    textSize(20);
+    text("L", npcLauraX, npcLauraY - 42);
+  }
 
   popStyle();
 }

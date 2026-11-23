@@ -94,78 +94,75 @@ void dibujarNpcBombero() {
   }
 
   pushStyle();
+  float respirar = sin(frameCount * 0.08) * 0.7;
+  float cuerpoY = npcBomberoY - 5 + respirar;
 
-  // SOMBRA
+  stroke(45, 52, 54);
+  strokeWeight(2);
+  strokeCap(ROUND);
+  strokeJoin(ROUND);
+  fill(45, 52, 54, 48);
   noStroke();
-  fill(0, 50);
-  ellipse(
-    npcBomberoX,
-    npcBomberoY + 34,
-    32,
-    10
-  );
+  ellipse(npcBomberoX, npcBomberoY + 33, 36, 9);
+  stroke(45, 52, 54);
+  strokeWeight(2);
 
-  // PIERNAS
-  fill(40);
+  // Pantalón de rescate y botas con franjas reflectivas
+  fill(232, 111, 105);
+  rect(npcBomberoX - 9, npcBomberoY + 9, 8, 19, 3);
+  rect(npcBomberoX + 1, npcBomberoY + 9, 8, 19, 3);
+  fill(250, 230, 120);
+  rect(npcBomberoX - 9, npcBomberoY + 17, 8, 3, 1);
+  rect(npcBomberoX + 1, npcBomberoY + 17, 8, 3, 1);
+  fill(54, 61, 68);
+  rect(npcBomberoX - 11, npcBomberoY + 25, 12, 7, 3);
+  rect(npcBomberoX + 1, npcBomberoY + 25, 12, 7, 3);
 
-  rect(
-    npcBomberoX - 8,
-    npcBomberoY + 15,
-    6,
-    20
-  );
+  // Chaqueta de emergencia y bandas reflectivas
+  fill(232, 111, 105);
+  rect(npcBomberoX - 15, cuerpoY - 15, 30, 29, 7);
+  fill(250, 230, 120);
+  rect(npcBomberoX - 14, cuerpoY - 2, 28, 5, 1);
+  rect(npcBomberoX - 9, cuerpoY - 15, 4, 28, 1);
+  line(npcBomberoX, cuerpoY - 12, npcBomberoX, cuerpoY + 10);
 
-  rect(
-    npcBomberoX + 2,
-    npcBomberoY + 15,
-    6,
-    20
-  );
+  // Cuello y rostro
+  fill(238, 193, 159);
+  rect(npcBomberoX - 5, npcBomberoY - 23, 10, 8, 2);
+  ellipse(npcBomberoX, npcBomberoY - 30, 25, 26);
+  fill(248, 246, 240);
+  ellipse(npcBomberoX - 5, npcBomberoY - 30, 5, 7);
+  ellipse(npcBomberoX + 5, npcBomberoY - 30, 5, 7);
+  fill(45, 52, 54);
+  ellipse(npcBomberoX - 4, npcBomberoY - 29, 2.5, 4);
+  ellipse(npcBomberoX + 6, npcBomberoY - 29, 2.5, 4);
+  noStroke();
+  fill(255);
+  ellipse(npcBomberoX - 5, npcBomberoY - 31, 1.8, 1.8);
+  ellipse(npcBomberoX + 5, npcBomberoY - 31, 1.8, 1.8);
 
-  // UNIFORME
-  fill(220, 60, 50);
-
-  rect(
-    npcBomberoX - 13,
-    npcBomberoY - 8,
-    26,
-    25,
-    4
-  );
-
-  // CABEZA
-  fill(230, 180, 140);
-
-  ellipse(
-    npcBomberoX,
-    npcBomberoY - 18,
-    22,
-    22
-  );
-
-  // CASCO
-  fill(220, 40, 40);
-
-  arc(
-    npcBomberoX,
-    npcBomberoY - 21,
-    27,
-    20,
-    PI,
-    TWO_PI
-  );
+  // Casco amarillo con ala, visera translúcida y emblema
+  stroke(45, 52, 54);
+  strokeWeight(2);
+  fill(250, 220, 92);
+  arc(npcBomberoX, npcBomberoY - 35, 31, 25, PI, TWO_PI);
+  rect(npcBomberoX - 16, npcBomberoY - 36, 32, 5, 3);
+  fill(248, 238, 190, 145);
+  arc(npcBomberoX, npcBomberoY - 28, 24, 12, 0, PI);
+  fill(232, 111, 105);
+  ellipse(npcBomberoX, npcBomberoY - 43, 8, 8);
+  noStroke();
+  fill(250, 230, 120);
+  textAlign(CENTER, CENTER);
+  textFont(fuenteTitulo);
+  textSize(7);
+  text("N", npcBomberoX, npcBomberoY - 43);
 
   // SIGNO DE INTERACCIÓN
   fill(255, 230, 70);
-
   textAlign(CENTER);
-  textSize(55);
-
-  text(
-    "!",
-    npcBomberoX,
-    npcBomberoY - 42
-  );
+  textSize(42);
+  text("!", npcBomberoX, npcBomberoY - 65 + sin(frameCount * 0.14) * 3);
 
   popStyle();
 }

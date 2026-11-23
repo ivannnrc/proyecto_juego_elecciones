@@ -530,21 +530,52 @@ void dibujarPersona(float x, float y, int v) {
 }
 
 void dibujarPersona(float x, float y, int v, float opacidad) {
-  fill(110, 110, 100, opacidad);
-  ellipse(x, y + 35, 30, 10);
+  float respiracion = sin(frameCount * 0.06 + v) * 1.0;
+  float torsoY = y - 4 + respiracion;
+  int variacion = ((v % 4) + 4) % 4;
 
-  fill(50, opacidad);
-  rect(x - 8, y + 18, 6, 18);
-  rect(x + 3, y + 18, 6, 18);
+  pushStyle();
+  stroke(45, 52, 54, opacidad);
+  strokeWeight(1.8);
+  strokeCap(ROUND);
+  strokeJoin(ROUND);
 
-  if (v == 0) fill(80, 120, 190, opacidad);
-  else if (v == 1) fill(200, 90, 90, opacidad);
-  else if (v == 2) fill(90, 170, 110, opacidad);
-  else fill(220, 170, 70, opacidad);
-  rect(x - 12, y - 5, 24, 25);
+  fill(35, 38, 34, 45 * opacidad / 255.0);
+  noStroke();
+  ellipse(x, y + 33, 27, 7);
+  stroke(45, 52, 54, opacidad);
+  strokeWeight(1.8);
 
-  fill(230, 180, 140, opacidad);
-  ellipse(x, y - 15, 22, 22);
+  // Piernas sencillas y compactas
+  fill(63, 67, 76, opacidad);
+  rect(x - 7, y + 11, 5, 17, 2);
+  rect(x + 2, y + 11, 5, 17, 2);
+
+  if (variacion == 0) fill(163, 186, 161, opacidad);
+  else if (variacion == 1) fill(218, 194, 158, opacidad);
+  else if (variacion == 2) fill(220, 151, 145, opacidad);
+  else fill(148, 185, 198, opacidad);
+  rect(x - 10, torsoY - 5, 20, 23, 7);
+
+  // Cuello y rostro
+  fill(235, 190, 160, opacidad);
+  rect(x - 3, torsoY - 10, 6, 7, 2);
+  ellipse(x, y - 17 + respiracion * 0.2, 19, 20);
+
+  // Cabello sencillo con siluetas y tonos variados
+  if (variacion == 0) fill(54, 57, 55, opacidad);
+  else if (variacion == 1) fill(91, 67, 57, opacidad);
+  else if (variacion == 2) fill(68, 51, 58, opacidad);
+  else fill(48, 62, 70, opacidad);
+  ellipse(x, y - 23 + respiracion * 0.2, 20, 14);
+  ellipse(x - 7, y - 19 + respiracion * 0.2, 5, 8);
+
+  // Rasgos mínimos para conservar la lectura secundaria
+  noStroke();
+  fill(45, 52, 54, opacidad);
+  ellipse(x - 4, y - 16 + respiracion * 0.2, 1.8, 2.4);
+  ellipse(x + 4, y - 16 + respiracion * 0.2, 1.8, 2.4);
+  popStyle();
 }
 
 void dibujarPuesto(float x, float yb) {
@@ -887,19 +918,94 @@ void fondoPlaza() {
 void dibujarNpcLaura() {
   pushStyle();
 
+  float respirar = sin(frameCount * 0.08) * 0.7;
+  float cuerpoY = npcLauraY - 5 + respirar;
+
+  stroke(45, 52, 54);
+  strokeWeight(2);
+  strokeCap(ROUND);
+  strokeJoin(ROUND);
+  fill(45, 52, 54, 48);
   noStroke();
-  fill(0, 50);
-  ellipse(npcLauraX, npcLauraY + 34, 32, 10);
+  ellipse(npcLauraX, npcLauraY + 33, 36, 9);
+  stroke(45, 52, 54);
+  strokeWeight(2);
 
-  fill(40);
-  rect(npcLauraX - 8, npcLauraY + 15, 6, 20);
-  rect(npcLauraX + 2, npcLauraY + 15, 6, 20);
+  // Pantalón y zapatos
+  fill(48, 54, 72);
+  rect(npcLauraX - 9, npcLauraY + 9, 8, 19, 3);
+  rect(npcLauraX + 1, npcLauraY + 9, 8, 19, 3);
+  fill(248, 246, 240);
+  rect(npcLauraX - 11, npcLauraY + 25, 12, 6, 3);
+  rect(npcLauraX + 1, npcLauraY + 25, 12, 6, 3);
 
-  fill(80, 130, 200);
-  rect(npcLauraX - 13, npcLauraY - 8, 26, 25, 4);
+  // Chaqueta menta sobre camiseta crema
+  fill(72, 187, 178);
+  rect(npcLauraX - 15, cuerpoY - 15, 30, 29, 7);
+  fill(248, 238, 216);
+  rect(npcLauraX - 6, cuerpoY - 13, 12, 24, 3);
+  fill(72, 187, 178);
+  triangle(npcLauraX - 10, cuerpoY - 13, npcLauraX - 3, cuerpoY - 5, npcLauraX - 6, cuerpoY - 16);
+  triangle(npcLauraX + 10, cuerpoY - 13, npcLauraX + 3, cuerpoY - 5, npcLauraX + 6, cuerpoY - 16);
+  line(npcLauraX - 9, cuerpoY + 2, npcLauraX - 6, cuerpoY + 2);
+  line(npcLauraX + 6, cuerpoY + 2, npcLauraX + 9, cuerpoY + 2);
 
-  fill(230, 180, 140);
-  ellipse(npcLauraX, npcLauraY - 18, 22, 22);
+  // Brazo y micrófono de reportera
+  fill(72, 187, 178);
+  rect(npcLauraX + 12, cuerpoY - 9, 7, 20, 4);
+  fill(238, 193, 159);
+  ellipse(npcLauraX + 16, cuerpoY + 12, 7, 7);
+  fill(45, 52, 54);
+  rect(npcLauraX + 14, cuerpoY + 8, 5, 12, 2);
+  fill(232, 111, 105);
+  ellipse(npcLauraX + 16.5, cuerpoY + 7, 8, 6);
+
+  // Credencial de prensa y cinta morada
+  noFill();
+  stroke(108, 92, 231);
+  strokeWeight(2);
+  line(npcLauraX - 5, cuerpoY - 11, npcLauraX + 2, cuerpoY + 5);
+  line(npcLauraX + 5, cuerpoY - 11, npcLauraX + 2, cuerpoY + 5);
+  fill(248, 246, 240);
+  stroke(45, 52, 54);
+  rect(npcLauraX - 3, cuerpoY + 3, 11, 13, 2);
+  noStroke();
+  fill(72, 187, 178);
+  rect(npcLauraX - 1, cuerpoY + 5, 7, 3, 1);
+  fill(45, 52, 54);
+  ellipse(npcLauraX + 2.5, cuerpoY + 11, 3, 3);
+
+  // Rostro, ojos y melena cobriza con volumen
+  stroke(45, 52, 54);
+  strokeWeight(2);
+  fill(238, 193, 159);
+  ellipse(npcLauraX, npcLauraY - 29, 26, 29);
+  fill(151, 83, 58);
+  ellipse(npcLauraX, npcLauraY - 38, 31, 22);
+  ellipse(npcLauraX - 12, npcLauraY - 29, 7, 19);
+  ellipse(npcLauraX + 12, npcLauraY - 29, 7, 19);
+  beginShape();
+  vertex(npcLauraX - 13, npcLauraY - 38);
+  vertex(npcLauraX - 5, npcLauraY - 36);
+  vertex(npcLauraX + 1, npcLauraY - 41);
+  vertex(npcLauraX + 7, npcLauraY - 36);
+  vertex(npcLauraX + 13, npcLauraY - 39);
+  vertex(npcLauraX + 11, npcLauraY - 32);
+  vertex(npcLauraX - 12, npcLauraY - 32);
+  endShape(CLOSE);
+  fill(248, 246, 240);
+  ellipse(npcLauraX - 5, npcLauraY - 29, 6, 8);
+  ellipse(npcLauraX + 5, npcLauraY - 29, 6, 8);
+  fill(45, 52, 54);
+  ellipse(npcLauraX - 4, npcLauraY - 28, 3, 5);
+  ellipse(npcLauraX + 6, npcLauraY - 28, 3, 5);
+  noStroke();
+  fill(255);
+  ellipse(npcLauraX - 5, npcLauraY - 30, 2, 2);
+  ellipse(npcLauraX + 5, npcLauraY - 30, 2, 2);
+  stroke(45, 52, 54);
+  noFill();
+  arc(npcLauraX, npcLauraY - 21, 7, 4, 0, PI);
 
   textAlign(CENTER);
   if (crisisColegioCompletadas >= 3 && !minijuegoPlazaTerminado) {
@@ -907,12 +1013,12 @@ void dibujarNpcLaura() {
     fill(255, 205, 55);
     textFont(fuenteTitulo);
     textSize(36);
-    text("!", npcLauraX, npcLauraY - 42 + bob);
+    text("!", npcLauraX, npcLauraY - 58 + bob);
   } else {
     fill(190, 230, 255);
     textFont(fuenteTitulo);
     textSize(20);
-    text("L", npcLauraX, npcLauraY - 42);
+    text("L", npcLauraX, npcLauraY - 58);
   }
 
   popStyle();

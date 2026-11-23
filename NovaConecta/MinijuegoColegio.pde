@@ -683,6 +683,28 @@ void procesarDecisionColegio(int opcion) {
   crisisColegioResuelta[i] = true;
 
   crisisColegioCompletadas++;
+  if (i == 0) {
+
+  mostrarDatoRedes(
+    "El 45% de los adolescentes dice que pasa demasiado " +
+    "tiempo en redes sociales."
+  );
+
+} else if (i == 1) {
+
+  mostrarDatoRedes(
+    "El 45% de los adolescentes dice que las redes sociales " +
+    "afectan negativamente la cantidad de sueño que obtiene."
+  );
+
+} else if (i == 2) {
+
+  mostrarDatoRedes(
+    "El 31% de los adolescentes siente presión en redes sociales " +
+    "para publicar contenido que sea popular."
+  );
+}
+ 
 
   // Ya no hay una publicación seleccionada
   publicacionColegioActual = -1;

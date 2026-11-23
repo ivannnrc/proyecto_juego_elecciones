@@ -700,6 +700,10 @@ void aplicarResultadoCarteles() {
   }
 
   resultadoCartelesAplicado = true;
+  mostrarDatoRedes(
+  "6 de cada 10 adolescentes sienten que tienen poco o ningún " +
+  "control sobre los datos personales que recopilan las redes."
+);
 
   float porcentaje =
   (float) incendiosApagados / incendios.length;

@@ -44,6 +44,10 @@ int tiempoInicioSlide = 0;
 int caracteresVisibles = 0;
 int ultimoTipeado = 0;
 PFont fuenteConecta;
+String datoRedesActual = "";
+boolean datoRedesVisible = false;
+int tiempoInicioDatoRedes = 0;
+int duracionDatoRedes = 4000;
 
 String[] textosIntro = {
   "Eres un estudiante de último año en el Colegio Nova.",
@@ -161,12 +165,17 @@ void draw() {
   }
 
   if (estadoJuego == ESTADO_FINAL) {
-    pushStyle();
-    actualizarControlFinal();
-    dibujarPantallaFinal();
-    popStyle();
-    return;
-  }
+  pushStyle();
+
+  actualizarControlFinal();
+  dibujarPantallaFinal();
+
+  // Mostrar dato educativo también sobre la pantalla final
+  dibujarDatoRedes();
+
+  popStyle();
+  return;
+}
 
   if (estadoJuego != ESTADO_JUEGO) {
     return;
@@ -229,7 +238,7 @@ void draw() {
   comprobarSituacionColegio();
   actualizarControlMinijuego1();
   dibujarAvisoMinijuego1();
-
+dibujarDatoRedes();
 }
 
 void actualizarControlIntro() {
@@ -642,6 +651,7 @@ void actualizarControlOutroMJ1() {
 
 void avanzarSlideOutroMJ1() {
   String textoActual = obtenerTextoOutroMJ1(slideOutroMJ1);
+
   if (caracteresVisiblesOutro < textoActual.length()) {
     caracteresVisiblesOutro = textoActual.length();
     ultimoTipeadoOutro = millis();
@@ -649,8 +659,15 @@ void avanzarSlideOutroMJ1() {
   }
 
   slideOutroMJ1++;
+
   if (slideOutroMJ1 > 2) {
     regresarAlColegioDesdeCarrera();
+
+    mostrarDatoRedes(
+      "En Colombia hay cerca de 44 millones de identidades " +
+      "en redes sociales, equivalentes al 81,4% de la población."
+    );
+
     return;
   }
 
@@ -1053,4 +1070,68 @@ void dibujarPantallaFinal() {
 );
 
   dibujarIndicadorIntro();
+}
+void mostrarDatoRedes(String mensaje) {
+
+  datoRedesActual = mensaje;
+  datoRedesVisible = true;
+  tiempoInicioDatoRedes = millis();
+}
+void dibujarDatoRedes() {
+
+  if (!datoRedesVisible) {
+    return;
+  }
+
+  if (millis() - tiempoInicioDatoRedes > duracionDatoRedes) {
+    datoRedesVisible = false;
+    return;
+  }
+
+  pushStyle();
+
+  float ancho = 560;
+float alto = 120;
+
+float x = width / 2 - ancho / 2;
+float y = height - 230;
+  // Fondo
+  fill(25, 30, 38, 235);
+  stroke(108, 220, 231);
+  strokeWeight(2);
+  rect(x, y, ancho, alto, 14);
+
+  // Título
+  fill(108, 220, 231);
+  textFont(fuenteTitulo);
+  textAlign(LEFT, TOP);
+  textSize(13);
+
+ // TÍTULO
+fill(108, 220, 231);
+textFont(fuenteTitulo);
+textAlign(LEFT, TOP);
+textSize(13);
+
+text(
+  "DATO SOBRE REDES",
+  x + 20,
+  y + 8
+);
+
+// TEXTO
+fill(245);
+textFont(fuenteCuerpo);
+textAlign(LEFT, TOP);
+textSize(13);
+
+text(
+  datoRedesActual,
+  x + 22,
+  y + 48,
+  ancho - 44,
+  50
+);
+
+  popStyle();
 }

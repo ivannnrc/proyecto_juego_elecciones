@@ -556,7 +556,7 @@ void revisarInteraccionBusPlaza() {
     xPresionadoAntes = false;
   }
 }
-
+//comentario prueba git 
 // -------------------------
 // 27.4 VIAJE A LA PLAZA
 // -------------------------

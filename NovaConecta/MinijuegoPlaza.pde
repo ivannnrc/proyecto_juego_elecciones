@@ -512,6 +512,10 @@ void aplicarResultadoPlaza() {
   } else {
     cambiarIndicadores(+5, +5, +5, +5, +5);
   }
+  mostrarDatoRedes(
+  "El 11% de los adolescentes mostró señales de uso problemático " +
+  "de redes sociales en un estudio de casi 280.000 jóvenes."
+);
 
   slideFinal = 1;
   caracteresVisiblesFinal = 0;

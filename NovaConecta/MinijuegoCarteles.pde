@@ -228,7 +228,7 @@ void controlarDialogoBombero() {
 
           dialogoBomberoActivo = false;
 
-          iniciarMinijuegoIncendios();
+          iniciarVideoInfluencer();
         }
       }
     }

@@ -11,6 +11,7 @@
 import net.java.games.input.*;
 import org.gamecontrolplus.*;
 import org.gamecontrolplus.gui.*;
+import processing.video.*;
 
 // =====================================================
 // ESTADOS DE JUEGO E INTRODUCCIÓN
@@ -19,6 +20,11 @@ import org.gamecontrolplus.gui.*;
 final int ESTADO_INTRO = 0;
 final int ESTADO_JUEGO = 1;
 final int ESTADO_MINIJUEGO1 = 2;
+final int ESTADO_VIDEO_CANDIDATOS = 6;
+Movie videoCandidatos;
+Movie videoInfluencer;
+
+final int ESTADO_VIDEO_INFLUENCER = 7;
 
 final int ESTADO_OUTRO_MJ1 = 3;
 int slideOutroMJ1 = 1;
@@ -71,6 +77,14 @@ void setup() {
   fuenteTitulo = createFont("Trebuchet MS Bold", 18);
   fuenteCuerpo = createFont("Trebuchet MS", 13);
   fuenteConecta = createFont("Trebuchet MS", 28);
+  videoCandidatos = new Movie(
+  this,
+  "videocandidatos.mp4"
+);
+videoInfluencer = new Movie(
+  this,
+  "videoinfluencer.mp4"
+);
 
   cargarEscenario(1);
 
@@ -133,7 +147,18 @@ botonL2 = mando.getButton(7);
 // =====================================================
 
 void draw() {
+if (estadoJuego == ESTADO_VIDEO_CANDIDATOS) {
 
+  dibujarVideoCandidatos();
+
+  return;
+}
+if (estadoJuego == ESTADO_VIDEO_INFLUENCER) {
+
+  dibujarVideoInfluencer();
+
+  return;
+}
   if (estadoJuego == ESTADO_INTRO) {
     pushStyle();
     actualizarControlIntro();
@@ -271,7 +296,7 @@ void dibujarIntroSlides() {
     rect(0, 0, width, height);
 
     if (millis() - tiempoInicioSlide >= 1500) {
-      iniciarJuegoDesdeIntro();
+      iniciarVideoCandidatos();
     }
     return;
   }
@@ -1134,4 +1159,99 @@ text(
 );
 
   popStyle();
+}
+void iniciarVideoCandidatos() {
+
+  estadoJuego = ESTADO_VIDEO_CANDIDATOS;
+
+  videoCandidatos.play();
+
+  println("VIDEO CANDIDATOS INICIADO");
+}
+
+
+void dibujarVideoCandidatos() {
+
+  background(0);
+
+  // Leer nuevos frames del video
+  if (videoCandidatos.available()) {
+    videoCandidatos.read();
+  }
+
+  // Dibujar solo cuando el video ya tenga imagen
+  if (
+    videoCandidatos.width > 0 &&
+    videoCandidatos.height > 0
+  ) {
+
+    imageMode(CORNER);
+
+    image(
+      videoCandidatos,
+      0,
+      0,
+      width,
+      height
+    );
+  }
+
+  // Cuando termina el video, comenzar el juego
+  if (
+    videoCandidatos.duration() > 0 &&
+    videoCandidatos.time() >=
+    videoCandidatos.duration() - 0.2
+  ) {
+
+    videoCandidatos.stop();
+
+    iniciarJuegoDesdeIntro();
+  }
+}
+void iniciarVideoInfluencer() {
+
+  estadoJuego = ESTADO_VIDEO_INFLUENCER;
+
+  videoInfluencer.play();
+
+  println("VIDEO INFLUENCER INICIADO");
+}
+
+
+void dibujarVideoInfluencer() {
+
+  background(0);
+
+  if (videoInfluencer.available()) {
+    videoInfluencer.read();
+  }
+
+  if (
+    videoInfluencer.width > 0 &&
+    videoInfluencer.height > 0
+  ) {
+
+    imageMode(CORNER);
+
+    image(
+      videoInfluencer,
+      0,
+      0,
+      width,
+      height
+    );
+  }
+
+  if (
+    videoInfluencer.duration() > 0 &&
+    videoInfluencer.time() >=
+    videoInfluencer.duration() - 0.2
+  ) {
+
+    videoInfluencer.stop();
+
+    estadoJuego = ESTADO_JUEGO;
+
+    iniciarMinijuegoIncendios();
+  }
 }
